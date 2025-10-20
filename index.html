@@ -1,0 +1,2125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCOET Store - Your One-Stop Shop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa; /* Light gray background */
+        }
+        #app {
+            position: relative;
+            z-index: 1;
+        }
+        #app::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Poppins, sans-serif' font-size='200' font-weight='bold' fill='%23e0e7ff'%3EJCOET%3C/text%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: 80% auto;
+            opacity: 0.2;
+            z-index: -1;
+        }
+        .modal {
+            transition: opacity 0.3s ease;
+            overflow-y: auto; /* Allows the modal overlay to scroll */
+        }
+        .modal-content {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        body.modal-open {
+            overflow: hidden;
+        }
+        .slider-container {
+            overflow: hidden;
+            position: relative;
+        }
+        .slider-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+        .slide {
+            min-width: 100%;
+            box-sizing: border-box;
+        }
+        .slider-dots {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .dot.active {
+            background-color: white;
+        }
+        #card-details-form {
+            transition: all 0.3s ease-in-out;
+        }
+         .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            background-color: #fbbf24;
+            transition: all 0.3s ease-in-out;
+            transform: translateX(-50%);
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+         .whatsapp-fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #25D366;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+        .whatsapp-fab:hover {
+            transform: scale(1.1);
+        }
+        /* Accordion styles */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        /* Loader for AI features */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Wishlist Heart */
+        .wishlist-btn .fa-heart {
+            transition: all 0.2s ease-in-out;
+        }
+        .wishlist-btn.active .fa-heart {
+            color: #ef4444; /* red-500 */
+            font-weight: 900; /* fas */
+        }
+        /* Rating Stars */
+        .rating-stars .fa-star {
+            cursor: pointer;
+            color: #d1d5db; /* gray-300 */
+            transition: color 0.2s;
+        }
+        .rating-stars .fa-star:hover,
+        .rating-stars .fa-star.selected {
+            color: #f59e0b; /* amber-500 */
+        }
+        /* Horizontal Scroll Container */
+        .scroll-container {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .scroll-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        .scroll-item {
+            scroll-snap-align: start;
+            flex: 0 0 80%;
+        }
+        @media (min-width: 640px) {
+            .scroll-item { flex: 0 0 45%; }
+        }
+        @media (min-width: 768px) {
+            .scroll-item { flex: 0 0 30%; }
+        }
+         @media (min-width: 1024px) {
+            .scroll-item { flex: 0 0 23%; }
+        }
+        /* Profile Tabs */
+        .profile-tab.active {
+            background-color: #eef2ff; /* indigo-100 */
+            color: #4338ca; /* indigo-700 */
+        }
+         /* Price Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 5px;
+            cursor: pointer;
+            animate: 0.2s;
+            background: #d1d5db;
+            border-radius: 5px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -6.5px;
+        }
+
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <div id="app" class="max-w-screen-2xl mx-auto bg-white shadow-lg">
+
+        <header class="bg-gradient-to-r from-blue-500 to-blue-600 shadow-md sticky top-0 z-40 text-white">
+            <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-store-alt text-3xl text-amber-300"></i>
+                    <a href="#" id="home-link" class="text-2xl font-bold">JCOET Store</a>
+                </div>
+                <div class="hidden lg:flex items-center space-x-8 text-lg">
+                    <a href="#" id="home-nav" class="nav-link hover:text-amber-300 active">Home</a>
+                    <a href="#" id="showcase-nav" class="nav-link hover:text-amber-300">Showcase</a>
+                    <a href="#" id="blog-nav" class="nav-link hover:text-amber-300">Blog</a>
+                    <a href="#" id="about-nav" class="nav-link hover:text-amber-300">About Us</a>
+                    <a href="#" id="contact-nav" class="nav-link hover:text-amber-300">Contact</a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden lg:block relative w-64">
+                        <input type="text" id="desktopSearchInput" class="w-full bg-blue-400 border-2 border-blue-500 rounded-full py-2 pl-6 pr-10 text-white placeholder-gray-200 focus:outline-none focus:bg-blue-500 focus:border-amber-300" placeholder="Search...">
+                        <div id="desktop-search-suggestions" class="absolute hidden mt-1 w-full bg-white text-black rounded-md shadow-lg z-50"></div>
+                    </div>
+                    <div id="auth-section" class="flex items-center space-x-4 sm:space-x-6">
+                        </div>
+                </div>
+            </nav>
+            <div id="mobileMenu" class="hidden lg:hidden bg-blue-600 border-t border-blue-500">
+                <a href="#" id="mobile-home-nav" class="block py-3 px-4 text-base hover:bg-blue-700">Home</a>
+                <a href="#" id="mobile-showcase-nav" class="block py-3 px-4 text-base hover:bg-blue-700">Showcase</a>
+                <a href="#" id="mobile-blog-nav" class="block py-3 px-4 text-base hover:bg-blue-700">Blog</a>
+                <a href="#" id="mobile-about-nav" class="block py-3 px-4 text-base hover:bg-blue-700">About Us</a>
+                <a href="#" id="mobile-contact-nav" class="block py-3 px-4 text-base hover:bg-blue-700">Contact</a>
+                 <div class="p-4">
+                     <div class="relative w-full">
+                        <input type="text" id="mobileSearchInput" class="w-full bg-blue-400 border-2 border-blue-500 rounded-full py-2 pl-6 pr-10 text-white placeholder-gray-200 focus:outline-none focus:bg-blue-500 focus:border-amber-300" placeholder="Search...">
+                        <div id="mobile-search-suggestions" class="absolute hidden mt-1 w-full bg-white text-black rounded-md shadow-lg z-50"></div>
+                    </div>
+                 </div>
+            </div>
+        </header>
+
+        <main id="main-content" class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-transparent">
+           </main>
+
+        <footer class="bg-gray-800 text-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">JCOET Store</h3>
+                        <p class="text-gray-400">Your trusted source for quality products and projects. Empowering students and hobbyists.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">Explore</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" id="footer-about" class="text-gray-400 hover:text-white">About Us</a></li>
+                             <li><a href="#" id="footer-showcase" class="text-gray-400 hover:text-white">Project Showcase</a></li>
+                            <li><a href="#" id="footer-blog" class="text-gray-400 hover:text-white">Blog</a></li>
+                            <li><a href="#" id="footer-seller" class="text-gray-400 hover:text-white">Become a Seller</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">Help</h3>
+                        <ul class="space-y-2">
+                             <li><a href="#" id="footer-contact" class="text-gray-400 hover:text-white">Contact Us</a></li>
+                            <li><a href="#" id="footer-faqs" class="text-gray-400 hover:text-white">FAQs</a></li>
+                            <li><a href="#" id="footer-privacy" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">Connect With Us</h3>
+                        <p class="text-gray-400">Email: <a href="mailto:support@jcoetstore.com" class="text-amber-400 hover:underline">support@jcoetstore.com</a></p>
+                        <div class="flex space-x-4 mt-4">
+                            <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f text-2xl"></i></a>
+                            <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter text-2xl"></i></a>
+                            <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram text-2xl"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center text-gray-500 border-t border-gray-700 mt-8 pt-6">
+                    &copy; 2024 JCOET Store. All Rights Reserved.
+                </div>
+            </div>
+        </footer>
+
+        <div id="productModal" class="modal fixed inset-0 bg-black bg-opacity-60 flex justify-center p-4 sm:p-8 hidden z-50 opacity-0"></div>
+        <div id="cartModal" class="modal fixed inset-0 bg-black bg-opacity-60 flex justify-center p-4 sm:p-8 hidden z-50 opacity-0"></div>
+        <div id="checkoutModal" class="modal fixed inset-0 bg-black bg-opacity-60 flex justify-center p-4 sm:p-8 hidden z-50 opacity-0"></div>
+        <div id="authModal" class="modal fixed inset-0 bg-black bg-opacity-60 flex justify-center p-4 sm:p-8 hidden z-50 opacity-0"></div>
+        <div id="aiAssistantModal" class="modal fixed inset-0 bg-black bg-opacity-60 flex justify-center p-4 sm:p-8 hidden z-50 opacity-0"></div>
+        <div id="filterModal" class="modal fixed inset-0 bg-black bg-opacity-60 flex justify-center p-4 sm:p-8 hidden z-50 opacity-0"></div>
+        <div id="projectSubmitModal" class="modal fixed inset-0 bg-black bg-opacity-60 flex justify-center p-4 sm:p-8 hidden z-50 opacity-0"></div>
+    </div>
+    
+    <a href="https://wa.me/qr/V777QONOIN53A1" target="_blank" class="whatsapp-fab">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        let products = [
+            // Add isNew property to some products
+            // Fashion
+            { id: 1, name: 'Classic Cotton T-Shirt', category: 'Fashion', price: 499, image: 'https://placehold.co/400x400/f87171/ffffff?text=T-Shirt', rating: 4, reviews: [], isNew: true },
+            { id: 2, name: 'Slim-Fit Denim Jeans', category: 'Fashion', price: 1499, image: 'https://placehold.co/400x400/fb923c/ffffff?text=Jeans', rating: 5, reviews: [] },
+            { id: 4, name: 'Stylish Running Sneakers', category: 'Fashion', price: 1299, image: 'https://placehold.co/400x400/fcd34d/ffffff?text=Sneakers', rating: 4, reviews: [] },
+            { id: 21, name: 'Men\'s Formal Shirt', category: 'Fashion', price: 999, image: 'https://placehold.co/400x400/fca5a5/ffffff?text=Shirt', rating: 4, reviews: [] },
+            { id: 22, name: 'Women\'s Kurti', category: 'Fashion', price: 799, image: 'https://placehold.co/400x400/fda4af/ffffff?text=Kurti', rating: 5, reviews: [], isNew: true },
+            { id: 31, name: 'Leather Wallet', category: 'Fashion', price: 599, image: 'https://placehold.co/400x400/818cf8/ffffff?text=Wallet', rating: 4, reviews: [] },
+            { id: 32, name: 'Silk Scarf', category: 'Fashion', price: 399, image: 'https://placehold.co/400x400/a78bfa/ffffff?text=Scarf', rating: 5, reviews: [] },
+            { id: 39, name: 'Unisex Hoodie', category: 'Fashion', price: 1199, image: 'https://placehold.co/400x400/f87171/ffffff?text=Hoodie', rating: 5, reviews: [] },
+            { id: 40, name: 'Polo T-Shirt', category: 'Fashion', price: 699, image: 'https://placehold.co/400x400/fb923c/ffffff?text=Polo', rating: 4, reviews: [] },
+            { id: 41, name: 'Cargo Pants', category: 'Fashion', price: 1399, image: 'https://placehold.co/400x400/fcd34d/ffffff?text=Pants', rating: 4, reviews: [] },
+            { id: 42, name: 'Denim Shorts', category: 'Fashion', price: 799, image: 'https://placehold.co/400x400/fca5a5/ffffff?text=Shorts', rating: 3, reviews: [] },
+            { id: 43, name: 'Aviator Sunglasses', category: 'Fashion', price: 899, image: 'https://placehold.co/400x400/fda4af/ffffff?text=Glasses', rating: 4, reviews: [] },
+            { id: 44, name: 'Baseball Cap', category: 'Fashion', price: 349, image: 'https://placehold.co/400x400/818cf8/ffffff?text=Cap', rating: 5, reviews: [] },
+            { id: 45, name: 'Canvas Belt', category: 'Fashion', price: 299, image: 'https://placehold.co/400x400/a78bfa/ffffff?text=Belt', rating: 4, reviews: [] },
+            { id: 46, name: 'Flip-Flops', category: 'Fashion', price: 249, image: 'https://placehold.co/400x400/c4b5fd/ffffff?text=Slippers', rating: 4, reviews: [] },
+            { id: 47, name: 'Pack of 3 Socks', category: 'Fashion', price: 199, image: 'https://placehold.co/400x400/ddd6fe/ffffff?text=Socks', rating: 5, reviews: [] },
+            { id: 48, name: 'Track Pants', category: 'Fashion', price: 899, image: 'https://placehold.co/400x400/e0e7ff/ffffff?text=Track+Pants', rating: 4, reviews: [] },
+            // Mobiles
+            { id: 94, name: 'iPhone 15 Pro', category: 'Mobiles', price: 99999, image: 'https://placehold.co/400x400/34d399/ffffff?text=iPhone+15+Pro', rating: 5, reviews: [], isNew: true },
+            { id: 95, name: 'Samsung Galaxy S24 Ultra', category: 'Mobiles', price: 95500, image: 'https://placehold.co/400x400/6ee7b7/ffffff?text=S24+Ultra', rating: 5, reviews: [] },
+            { id: 96, name: 'Google Pixel 8 Pro', category: 'Mobiles', price: 89999, image: 'https://placehold.co/400x400/a7f3d0/ffffff?text=Pixel+8+Pro', rating: 5, reviews: [] },
+            { id: 97, name: 'OnePlus 12', category: 'Mobiles', price: 64999, image: 'https://placehold.co/400x400/ccfbf1/ffffff?text=OnePlus+12', rating: 4, reviews: [] },
+            { id: 5, name: '10000mAh Power Bank', category: 'Mobiles', price: 1199, image: 'https://placehold.co/400x400/34d399/ffffff?text=Power+Bank', rating: 5, reviews: [] },
+            { id: 6, name: 'Wireless Bluetooth Earphones', category: 'Mobiles', price: 1499, image: 'https://placehold.co/400x400/6ee7b7/ffffff?text=Earphones', rating: 5, 
+                reviews: [
+                    { author: 'Rohan', text: 'Great sound quality and battery life is amazing!' },
+                    { author: 'Priya', text: 'Connects easily, but the fit is a bit loose for my ears.' },
+                    { author: 'Amit', text: 'Value for money. The bass is surprisingly good for the price.' },
+                    { author: 'Sneha', text: 'The noise cancellation is not the best, but it works fine for calls.' }
+                ], 
+                isNew: true 
+            },
+            { id: 7, name: 'Fast Charging Cable', category: 'Mobiles', price: 499, image: 'https://placehold.co/400x400/a7f3d0/ffffff?text=Cable', rating: 4, reviews: [] },
+            { id: 8, name: 'Protective Phone Case', category: 'Mobiles', price: 399, image: 'https://placehold.co/400x400/ccfbf1/ffffff?text=Case', rating: 5, reviews: [] },
+            { id: 23, name: 'Mobile Stand Holder', category: 'Mobiles', price: 299, image: 'https://placehold.co/400x400/5eead4/ffffff?text=Stand', rating: 4, reviews: [] },
+            { id: 24, name: 'Car Mobile Charger', category: 'Mobiles', price: 699, image: 'https://placehold.co/400x400/2dd4bf/ffffff?text=Charger', rating: 4, reviews: [] },
+            { id: 49, name: 'Tempered Glass Screen Protector', category: 'Mobiles', price: 199, image: 'https://placehold.co/400x400/34d399/ffffff?text=Screen+Guard', rating: 5, reviews: [] },
+            { id: 50, name: 'Pop Socket Grip', category: 'Mobiles', price: 149, image: 'https://placehold.co/400x400/6ee7b7/ffffff?text=Pop+Grip', rating: 4, reviews: [] },
+            { id: 51, name: 'OTG Adapter', category: 'Mobiles', price: 129, image: 'https://placehold.co/400x400/a7f3d0/ffffff?text=OTG', rating: 4, reviews: [] },
+            { id: 52, name: 'Wired Earphones with Mic', category: 'Mobiles', price: 399, image: 'https://placehold.co/400x400/ccfbf1/ffffff?text=Wired+Earphones', rating: 4, reviews: [] },
+            { id: 53, name: 'Bluetooth Neckband', category: 'Mobiles', price: 999, image: 'https://placehold.co/400x400/5eead4/ffffff?text=Neckband', rating: 5, reviews: [] },
+            { id: 54, name: 'Selfie Stick Tripod', category: 'Mobiles', price: 799, image: 'https://placehold.co/400x400/2dd4bf/ffffff?text=Selfie+Stick', rating: 4, reviews: [] },
+            { id: 55, name: 'Mobile Ring Light', category: 'Mobiles', price: 349, image: 'https://placehold.co/400x400/0d9488/ffffff?text=Ring+Light', rating: 3, reviews: [] },
+            { id: 56, name: 'Basic VR Headset', category: 'Mobiles', price: 1299, image: 'https://placehold.co/400x400/0f766e/ffffff?text=VR+Headset', rating: 4, reviews: [] },
+            { id: 57, name: 'Gaming Triggers for Mobile', category: 'Mobiles', price: 299, image: 'https://placehold.co/400x400/115e59/ffffff?text=Triggers', rating: 4, reviews: [] },
+            // Electronics
+            { id: 98, name: 'MacBook Pro M3', category: 'Electronics', price: 99900, image: 'https://placehold.co/400x400/60a5fa/ffffff?text=MacBook+Pro', rating: 5, reviews: [] },
+            { id: 99, name: 'Dell XPS 15 Laptop', category: 'Electronics', price: 92000, image: 'https://placehold.co/400x400/93c5fd/ffffff?text=Dell+XPS', rating: 5, reviews: [] },
+            { id: 100, name: 'Sony Bravia 4K TV', category: 'Electronics', price: 75999, image: 'https://placehold.co/400x400/bfdbfe/ffffff?text=Sony+TV', rating: 5, reviews: [] },
+            { id: 101, name: 'Professional DSLR Camera', category: 'Electronics', price: 85500, image: 'https://placehold.co/400x400/dbeafe/ffffff?text=DSLR', rating: 4, reviews: [] },
+            { id: 102, name: 'High-Performance Gaming PC', category: 'Electronics', price: 98999, image: 'https://placehold.co/400x400/a5b4fc/ffffff?text=Gaming+PC', rating: 5, reviews: [] },
+            { id: 9, name: 'Wireless Optical Mouse', category: 'Electronics', price: 799, image: 'https://placehold.co/400x400/60a5fa/ffffff?text=Mouse', rating: 5, reviews: [] },
+            { id: 10, name: 'Portable USB Fan', category: 'Electronics', price: 499, image: 'https://placehold.co/400x400/93c5fd/ffffff?text=Fan', rating: 4, reviews: [] },
+            { id: 11, name: 'Portable Bluetooth Speaker', category: 'Electronics', price: 1299, image: 'https://placehold.co/400x400/bfdbfe/ffffff?text=Speaker', rating: 4, reviews: [], isNew: true },
+            { id: 12, name: 'LED Desk Lamp', category: 'Electronics', price: 999, image: 'https://placehold.co/400x400/dbeafe/ffffff?text=Lamp', rating: 5, reviews: [] },
+            { id: 25, 'name': 'Wired Gaming Keyboard', category: 'Electronics', price: 1499, image: 'https://placehold.co/400x400/a5b4fc/ffffff?text=Keyboard', rating: 5, reviews: [] },
+            { id: 26, 'name': 'HD Webcam', category: 'Electronics', price: 1199, image: 'https://placehold.co/400x400/818cf8/ffffff?text=Webcam', rating: 4, reviews: [] },
+            { id: 58, name: '4-Port USB Hub', category: 'Electronics', price: 399, image: 'https://placehold.co/400x400/60a5fa/ffffff?text=USB+Hub', rating: 4, reviews: [] },
+            { id: 59, name: 'Multi-Card Reader', category: 'Electronics', price: 249, image: 'https://placehold.co/400x400/93c5fd/ffffff?text=Card+Reader', rating: 4, reviews: [] },
+            { id: 60, name: 'Laptop Sleeve Case', category: 'Electronics', price: 699, image: 'https://placehold.co/400x400/bfdbfe/ffffff?text=Sleeve', rating: 5, reviews: [] },
+            { id: 61, name: 'Laptop Cooling Pad', category: 'Electronics', price: 1199, image: 'https://placehold.co/400x400/dbeafe/ffffff?text=Cooling+Pad', rating: 4, reviews: [] },
+            { id: 62, name: 'Smart Wi-Fi Bulb', category: 'Electronics', price: 899, image: 'https://placehold.co/400x400/a5b4fc/ffffff?text=Smart+Bulb', rating: 5, reviews: [] },
+            { id: 63, name: 'Digital Alarm Clock', category: 'Electronics', price: 599, image: 'https://placehold.co/400x400/818cf8/ffffff?text=Clock', rating: 3, reviews: [] },
+            { id: 64, name: 'Electric Kettle', category: 'Electronics', price: 999, image: 'https://placehold.co/400x400/6366f1/ffffff?text=Kettle', rating: 4, reviews: [] },
+            { id: 65, name: 'Men\'s Beard Trimmer', category: 'Electronics', price: 1299, image: 'https://placehold.co/400x400/4f46e5/ffffff?text=Trimmer', rating: 5, reviews: [] },
+            { id: 66, name: 'HDMI Cable (3m)', category: 'Electronics', price: 349, image: 'https://placehold.co/400x400/4338ca/ffffff?text=HDMI', rating: 4, reviews: [] },
+             // Beauty
+            { id: 13, name: 'Vitamin C Face Serum', category: 'Beauty', price: 599, image: 'https://placehold.co/400x400/c084fc/ffffff?text=Serum', rating: 5, reviews: [] },
+            { id: 14, name: 'Hydrating Moisturizer Cream', category: 'Beauty', price: 349, image: 'https://placehold.co/400x400/d8b4fe/ffffff?text=Cream', rating: 4, reviews: [] },
+            { id: 15, name: 'Matte Finish Lipstick Set', category: 'Beauty', price: 899, image: 'https://placehold.co/400x400/e9d5ff/ffffff?text=Lipstick', rating: 4, reviews: [] },
+            { id: 16, name: 'Organic Green Tea Face Mask', category: 'Beauty', price: 499, image: 'https://placehold.co/400x400/f3e8ff/ffffff?text=Mask', rating: 5, reviews: [] },
+            { id: 27, name: 'Charcoal Face Wash', category: 'Beauty', price: 249, image: 'https://placehold.co/400x400/c4b5fd/ffffff?text=Face+Wash', rating: 4, reviews: [] },
+            { id: 28, name: 'Sunscreen SPF 50', category: 'Beauty', price: 450, image: 'https://placehold.co/400x400/a78bfa/ffffff?text=Sunscreen', rating: 5, reviews: [] },
+            { id: 67, name: 'Herbal Shampoo', category: 'Beauty', price: 299, image: 'https://placehold.co/400x400/c084fc/ffffff?text=Shampoo', rating: 4, reviews: [] },
+            { id: 68, name: 'Hair Conditioner', category: 'Beauty', price: 319, image: 'https://placehold.co/400x400/d8b4fe/ffffff?text=Conditioner', rating: 4, reviews: [] },
+            { id: 69, name: 'Body Lotion', category: 'Beauty', price: 199, image: 'https://placehold.co/400x400/e9d5ff/ffffff?text=Lotion', rating: 5, reviews: [] },
+            { id: 70, name: 'Deodorant Spray', category: 'Beauty', price: 229, image: 'https://placehold.co/400x400/f3e8ff/ffffff?text=Deo', rating: 4, reviews: [] },
+            { id: 71, name: 'Nail Polish Set (Pack of 5)', category: 'Beauty', price: 499, image: 'https://placehold.co/400x400/c4b5fd/ffffff?text=Nail+Polish', rating: 4, reviews: [] },
+            { id: 72, name: 'Makeup Remover Wipes', category: 'Beauty', price: 149, image: 'https://placehold.co/400x400/a78bfa/ffffff?text=Wipes', rating: 5, reviews: [] },
+            { id: 73, name: 'Lip Balm (Pack of 2)', category: 'Beauty', price: 179, image: 'https://placehold.co/400x400/818cf8/ffffff?text=Lip+Balm', rating: 4, reviews: [] },
+            { id: 74, name: 'Hair Styling Gel', category: 'Beauty', price: 259, image: 'https://placehold.co/400x400/6366f1/ffffff?text=Hair+Gel', rating: 3, reviews: [] },
+            { id: 75, name: 'Beard Growth Oil', category: 'Beauty', price: 399, image: 'https://placehold.co/400x400/4f46e5/ffffff?text=Beard+Oil', rating: 4, reviews: [] },
+            // Toys
+            { id: 17, name: 'Remote Control Super Car', category: 'Toys', price: 1299, image: 'https://placehold.co/400x400/f472b6/ffffff?text=RC+Car', rating: 4, reviews: [] },
+            { id: 18, name: '3D Jigsaw Puzzle', category: 'Toys', price: 799, image: 'https://placehold.co/400x400/f9a8d4/ffffff?text=Puzzle', rating: 5, reviews: [] },
+            { id: 19, name: 'Educational STEM Building Blocks', category: 'Toys', price: 999, image: 'https://placehold.co/400x400/fbcfe8/ffffff?text=Blocks', rating: 5, reviews: [] },
+            { id: 20, name: 'Plush Teddy Bear', category: 'Toys', price: 799, image: 'https://placehold.co/400x400/fce7f3/ffffff?text=Teddy', rating: 4, reviews: [] },
+            { id: 29, name: 'Ludo & Snakes Board Game', category: 'Toys', price: 499, image: 'https://placehold.co/400x400/f0abfc/ffffff?text=Board+Game', rating: 5, reviews: [] },
+            { id: 30, name: 'Chess Board Set', category: 'Toys', price: 599, image: 'https://placehold.co/400x400/e879f9/ffffff?text=Chess', rating: 4, reviews: [] },
+            { id: 76, name: 'Rubik\'s Cube 3x3', category: 'Toys', price: 299, image: 'https://placehold.co/400x400/f472b6/ffffff?text=Rubiks+Cube', rating: 5, reviews: [] },
+            { id: 77, name: 'Toy Car Set (5 cars)', category: 'Toys', price: 499, image: 'https://placehold.co/400x400/f9a8d4/ffffff?text=Toy+Cars', rating: 4, reviews: [] },
+            { id: 78, name: 'Superhero Action Figure', category: 'Toys', price: 699, image: 'https://placehold.co/400x400/fbcfe8/ffffff?text=Action+Figure', rating: 4, reviews: [] },
+            { id: 79, name: 'Doll with Accessories', category: 'Toys', price: 899, image: 'https://placehold.co/400x400/fce7f3/ffffff?text=Doll', rating: 4, reviews: [] },
+            { id: 80, name: 'Kitchen Play Set', category: 'Toys', price: 1199, image: 'https://placehold.co/400x400/f0abfc/ffffff?text=Kitchen+Set', rating: 5, reviews: [] },
+            { id: 81, name: 'Doctor Play Set', category: 'Toys', price: 1099, image: 'https://placehold.co/400x400/e879f9/ffffff?text=Doctor+Set', rating: 4, reviews: [] },
+            { id: 82, name: 'Art & Craft Kit', category: 'Toys', price: 799, image: 'https://placehold.co/400x400/db2777/ffffff?text=Craft+Kit', rating: 5, reviews: [] },
+            { id: 83, name: 'Badminton Racket Set', category: 'Toys', price: 999, image: 'https://placehold.co/400x400/be185d/ffffff?text=Badminton', rating: 4, reviews: [] },
+            { id: 84, name: 'Bubble Maker Gun', category: 'Toys', price: 399, image: 'https://placehold.co/400x400/9d174d/ffffff?text=Bubbles', rating: 3, reviews: [] },
+            // Books
+            { id: 33, name: 'Data Structures Textbook', category: 'Books', price: 750, image: 'https://placehold.co/400x400/b91c1c/ffffff?text=DSA+Book', rating: 5, reviews: [] },
+            { id: 34, name: 'C++ Programming Guide', category: 'Books', price: 650, image: 'https://placehold.co/400x400/dc2626/ffffff?text=C%2B%2B+Book', rating: 4, reviews: [] },
+            { id: 35, name: 'The Psychology of Money', category: 'Books', price: 499, image: 'https://placehold.co/400x400/ef4444/ffffff?text=Novel', rating: 5, reviews: [] },
+            { id: 36, name: 'A Brief History of Time', category: 'Books', price: 550, image: 'https://placehold.co/400x400/f87171/ffffff?text=Science+Book', rating: 5, reviews: [] },
+            { id: 37, name: 'Mechanical Engineering Basics', category: 'Books', price: 800, image: 'https://placehold.co/400x400/fca5a5/ffffff?text=Mech+Book', rating: 4, reviews: [] },
+            { id: 38, name: 'Civil Engineering Handbook', category: 'Books', price: 850, image: 'https://placehold.co/400x400/fecaca/ffffff?text=Civil+Book', rating: 4, reviews: [] },
+            { id: 85, name: 'Competitive Exam Guide', category: 'Books', price: 999, image: 'https://placehold.co/400x400/b91c1c/ffffff?text=Exam+Guide', rating: 5, reviews: [] },
+            { id: 86, name: 'Atomic Habits', category: 'Books', price: 599, image: 'https://placehold.co/400x400/dc2626/ffffff?text=Self-Help', rating: 5, reviews: [] },
+            { id: 87, name: '1984 by George Orwell', category: 'Books', price: 349, image: 'https://placehold.co/400x400/ef4444/ffffff?text=1984', rating: 5, reviews: [], isNew: true },
+            { id: 88, name: 'Programming with Python', category: 'Books', price: 799, image: 'https://placehold.co/400x400/f87171/ffffff?text=Python', rating: 4, reviews: [] },
+            { id: 89, name: 'Web Development Guide', category: 'Books', price: 899, image: 'https://placehold.co/400x400/fca5a5/ffffff?text=Web+Dev', rating: 4, reviews: [] },
+            { id: 90, name: 'Electrical Engineering Handbook', category: 'Books', price: 950, image: 'https://placehold.co/400x400/fecaca/ffffff?text=Elec+Book', rating: 4, reviews: [] },
+            { id: 91, name: 'General Knowledge 2025', category: 'Books', price: 450, image: 'https://placehold.co/400x400/fee2e2/ffffff?text=GK+Book', rating: 4, reviews: [] },
+            { id: 92, name: 'Quantitative Aptitude', category: 'Books', price: 650, image: 'https://placehold.co/400x400/b91c1c/ffffff?text=Aptitude', rating: 5, reviews: [] },
+            { id: 93, name: 'The Alchemist', category: 'Books', price: 399, image: 'https://placehold.co/400x400/dc2626/ffffff?text=Novel', rating: 5, reviews: [] },
+        ];
+
+        let studentProjects = [
+            { id: 1, student: 'Rohan Sharma', title: 'Automated Plant Watering System', image: 'https://placehold.co/600x400/a7f3d0/ffffff?text=Project+1', description: 'Used an Arduino, soil moisture sensor, and a small water pump from the store to build this. Now my plants never die!' },
+            { id: 2, student: 'Priya Patel', title: 'Custom LED Desk Lamp', image: 'https://placehold.co/600x400/dbeafe/ffffff?text=Project+2', description: 'I bought the LED strips and a USB cable to create a cool, programmable desk lamp for late-night study sessions.'},
+            { id: 3, student: 'Amit Singh', title: 'Hand-painted College Merch', image: 'https://placehold.co/600x400/fecaca/ffffff?text=Project+3', description: 'Got some plain t-shirts and fabric paints from the store and designed my own custom JCOET apparel.'}
+        ];
+
+        const categories = [
+            { name: 'Fashion', icon: 'fa-tshirt', color: 'bg-red-100 text-red-500', hover: 'hover:bg-red-200' },
+            { name: 'Mobiles', icon: 'fa-mobile-alt', color: 'bg-green-100 text-green-500', hover: 'hover:bg-green-200' },
+            { name: 'Electronics', icon: 'fa-laptop', color: 'bg-blue-100 text-blue-500', hover: 'hover:bg-blue-200' },
+            { name: 'Beauty', icon: 'fa-magic', color: 'bg-purple-100 text-purple-500', hover: 'hover:bg-purple-200' },
+            { name: 'Toys', icon: 'fa-robot', color: 'bg-pink-100 text-pink-500', hover: 'hover:bg-pink-200' },
+            { name: 'Books', icon: 'fa-book-open', color: 'bg-yellow-100 text-yellow-500', hover: 'hover:bg-yellow-200' },
+        ];
+
+
+        let cart = [];
+        let wishlist = [];
+        let recentlyViewed = [];
+        let currentUser = null; // To track logged-in state
+
+        // --- Gemini API Configuration ---
+        const API_KEY = ""; // Keep this empty, it will be handled by the environment
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
+        
+        // --- Element Selectors ---
+        const mainContent = document.getElementById('main-content');
+        const authSection = document.getElementById('auth-section');
+        const productModalEl = document.getElementById('productModal');
+        const cartModalEl = document.getElementById('cartModal');
+        const checkoutModalEl = document.getElementById('checkoutModal');
+        const authModalEl = document.getElementById('authModal');
+        const aiAssistantModalEl = document.getElementById('aiAssistantModal');
+        const filterModalEl = document.getElementById('filterModal');
+        const projectSubmitModalEl = document.getElementById('projectSubmitModal');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        // --- Navigation Links ---
+        const navLinks = {
+            home: [document.getElementById('home-link'), document.getElementById('home-nav'), document.getElementById('mobile-home-nav')],
+            showcase: [document.getElementById('showcase-nav'), document.getElementById('mobile-showcase-nav'), document.getElementById('footer-showcase')],
+            blog: [document.getElementById('blog-nav'), document.getElementById('mobile-blog-nav'), document.getElementById('footer-blog')],
+            about: [document.getElementById('about-nav'), document.getElementById('mobile-about-nav'), document.getElementById('footer-about')],
+            contact: [document.getElementById('contact-nav'), document.getElementById('mobile-contact-nav'), document.getElementById('footer-contact')],
+            privacy: [document.getElementById('footer-privacy')],
+            faqs: [document.getElementById('footer-faqs')],
+            seller: [document.getElementById('footer-seller')],
+            profile: [], // Will be populated dynamically
+        };
+
+        // --- Gemini API Caller ---
+        const callGeminiApi = async (prompt, schema, useGrounding = false, retries = 3, delay = 1000) => {
+            const payload = { contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", responseSchema: schema } };
+            if (useGrounding) { payload.tools = [{ "google_search": {} }]; }
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
+                    const result = await response.json();
+                    const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (jsonText) return JSON.parse(jsonText);
+                    else throw new Error("Invalid response structure from API.");
+                } catch (error) {
+                    console.error(`Attempt ${i + 1} failed:`, error);
+                    if (i < retries - 1) await new Promise(res => setTimeout(res, delay * Math.pow(2, i)));
+                    else return null;
+                }
+            }
+        };
+
+        // --- Modal Management ---
+        function openModal(modalElement) {
+            document.body.classList.add('modal-open');
+            modalElement.classList.remove('hidden');
+            setTimeout(() => {
+                modalElement.classList.remove('opacity-0');
+                const modalContent = modalElement.querySelector('.modal-content');
+                if (modalContent) modalContent.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        }
+
+        function closeModal(modalElement) {
+            if(!modalElement) return;
+            document.body.classList.remove('modal-open');
+            modalElement.classList.add('opacity-0');
+            const modalContent = modalElement.querySelector('.modal-content');
+            if (modalContent) modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => modalElement.classList.add('hidden'), 300);
+        }
+
+        function closeAllModals() {
+            [productModalEl, cartModalEl, checkoutModalEl, authModalEl, aiAssistantModalEl, filterModalEl, projectSubmitModalEl].forEach(closeModal);
+            document.body.classList.remove('modal-open');
+        }
+
+        // --- Cart Logic ---
+        const updateCart = () => {
+            updateAuthSection(); // This updates the count in the header
+            if (cartModalEl && !cartModalEl.classList.contains('hidden')) renderCartModal(); // Re-render cart modal if open
+        };
+        const addToCart = (productId, fromRec = false) => {
+            const product = products.find(p => p.id === productId);
+            const cartItem = cart.find(item => item.id === productId);
+            if (cartItem) {
+                cartItem.quantity++;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            updateCart();
+            // If added from a recommendation, don't show animation on main page
+            if (fromRec) return;
+
+            const button = document.querySelector(`.add-to-cart-btn[data-product-id="${productId}"]`);
+            if (button) {
+                 button.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => {
+                    button.innerHTML = '<i class="fas fa-cart-plus"></i>';
+                }, 1000);
+            }
+        };
+        const changeQuantity = (productId, change) => {
+            const cartItem = cart.find(item => item.id === productId);
+            if (cartItem) {
+                cartItem.quantity += change;
+                if (cartItem.quantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    updateCart();
+                }
+            }
+        };
+        const removeFromCart = (productId) => {
+            cart = cart.filter(item => item.id !== productId);
+            updateCart();
+        };
+
+        // --- Helper Functions ---
+        function setupSlider() {
+            const sliderTrack = document.querySelector('.slider-track');
+            if (!sliderTrack) return;
+            const slides = sliderTrack.querySelectorAll('.slide');
+            const dotsContainer = document.querySelector('.slider-dots');
+            dotsContainer.innerHTML = '';
+            let currentIndex = 0;
+            if (slides.length === 0) return;
+            slides.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                if (i === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => goToSlide(i));
+                dotsContainer.appendChild(dot);
+            });
+            const goToSlide = (index) => {
+                if (index < 0 || index >= slides.length) return;
+                currentIndex = index;
+                sliderTrack.style.transform = `translateX(-${index * 100}%)`;
+                dotsContainer.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === index));
+            };
+            setInterval(() => goToSlide((currentIndex + 1) % slides.length), 5000);
+        }
+        
+        function handleSearch(event) {
+            const searchTerm = event.target.value.toLowerCase().trim();
+            const suggestionsContainer = event.target.id === 'desktopSearchInput' ? document.getElementById('desktop-search-suggestions') : document.getElementById('mobile-search-suggestions');
+            
+            if (searchTerm.length > 1) {
+                const matchedProducts = products.filter(p => p.name.toLowerCase().includes(searchTerm)).slice(0, 5);
+                if (matchedProducts.length > 0) {
+                    suggestionsContainer.innerHTML = matchedProducts.map(p => `<div class="p-2 hover:bg-gray-100 cursor-pointer search-suggestion" data-term="${p.name}">${p.name}</div>`).join('');
+                    suggestionsContainer.classList.remove('hidden');
+                } else {
+                    suggestionsContainer.classList.add('hidden');
+                }
+            } else {
+                suggestionsContainer.classList.add('hidden');
+            }
+
+            if(event.type === 'input' && event.target.dataset.fromSuggestion !== 'true') {
+                 updateDisplayedProducts(searchTerm);
+            }
+            event.target.dataset.fromSuggestion = 'false';
+        }
+        
+        function selectSearchSuggestion(term) {
+             const desktopInput = document.getElementById('desktopSearchInput');
+             const mobileInput = document.getElementById('mobileSearchInput');
+             desktopInput.value = term;
+             mobileInput.value = term;
+             desktopInput.dataset.fromSuggestion = 'true';
+             mobileInput.dataset.fromSuggestion = 'true';
+
+             document.getElementById('desktop-search-suggestions').classList.add('hidden');
+             document.getElementById('mobile-search-suggestions').classList.add('hidden');
+             
+             if (document.getElementById('all-products-grid')?.offsetParent === null) {
+                navigate('home', { searchTerm: term });
+             } else {
+                updateDisplayedProducts(term.toLowerCase().trim());
+             }
+        }
+        
+
+        function handleBuyNow(productId) {
+            if (!currentUser) { 
+                renderAuthModal('login');
+                return; 
+            }
+            cart = [];
+            const product = products.find(p => p.id === productId);
+            if (product) cart.push({ ...product, quantity: 1 });
+            updateAuthSection();
+
+            if (productModalEl && !productModalEl.classList.contains('hidden')) {
+                closeModal(productModalEl);
+                setTimeout(() => {
+                    renderCheckoutModal('address');
+                }, 300); 
+            } else {
+                renderCheckoutModal('address');
+            }
+        }
+
+        // --- Authentication ---
+        const updateAuthSection = () => {
+             let content = '';
+             if (currentUser) {
+                 content = `
+                    <button id="profile-nav" class="hover:text-amber-300 flex items-center space-x-2 text-sm sm:text-base">
+                        <i class="fas fa-user-circle text-2xl"></i>
+                        <span class="hidden sm:inline">${currentUser.name.split(' ')[0]}</span>
+                    </button>
+                    <button id="cartButton" class="relative hover:text-amber-300">
+                        <i class="fas fa-shopping-cart text-2xl"></i>
+                        <span id="cartCount" class="absolute -top-2 -right-3 bg-amber-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">${cart.reduce((sum, item) => sum + item.quantity, 0)}</span>
+                    </button>
+                    <button id="mobileMenuButton" class="lg:hidden hover:text-amber-300">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                 `;
+             } else {
+                 content = `
+                    <button id="loginButton" class="hover:text-amber-300 flex items-center space-x-2 text-sm sm:text-base">
+                        <i class="fas fa-user-circle text-2xl"></i>
+                        <span class="hidden sm:inline">Sign In</span>
+                    </button>
+                    <button id="cartButton" class="relative hover:text-amber-300">
+                        <i class="fas fa-shopping-cart text-2xl"></i>
+                        <span id="cartCount" class="absolute -top-2 -right-3 bg-amber-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">${cart.reduce((sum, item) => sum + item.quantity, 0)}</span>
+                    </button>
+                    <button id="mobileMenuButton" class="lg:hidden hover:text-amber-300">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                 `;
+             }
+             authSection.innerHTML = content;
+             // Re-add event listeners for dynamically created elements
+             document.getElementById('cartButton').addEventListener('click', renderCartModal);
+             const mobileMenuBtn = document.getElementById('mobileMenuButton');
+             if(mobileMenuBtn) mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+             if(currentUser) {
+                const profileNavBtn = document.getElementById('profile-nav');
+                if(profileNavBtn) profileNavBtn.addEventListener('click', () => navigate('profile'));
+             } else {
+                const loginBtn = document.getElementById('loginButton');
+                if(loginBtn) loginBtn.addEventListener('click', () => renderAuthModal('login'));
+             }
+        };
+
+        const loginUser = (name, email) => {
+            currentUser = { name, email, orders: [], points: 0 }; // Add points for new user
+            updateAuthSection();
+            closeModal(authModalEl);
+            navigate('home');
+        };
+
+        const logoutUser = () => {
+            currentUser = null;
+            updateAuthSection();
+            navigate('home');
+        };
+        
+        // --- SPA Navigation ---
+        const updateActiveLink = (page) => {
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            const activeLink = document.getElementById(`${page}-nav`);
+            if(activeLink) activeLink.classList.add('active');
+        };
+
+        const renderHomePage = async (options = {}) => {
+            let personalizedSection = '';
+            if (currentUser) {
+                // Show a loader while fetching personalized content
+                personalizedSection = `<section id="personalized-section" class="mb-12"><div class="loader mx-auto"></div></section>`;
+            }
+
+            mainContent.innerHTML = `
+                ${personalizedSection}
+                <div class="slider-container rounded-lg shadow-lg mb-8 h-48 md:h-64 lg:h-96">
+                    <div class="slider-track h-full">
+                        <div class="slide h-full"><img src="https://placehold.co/1200x500/fbbf24/ffffff?text=Grand+Opening+Sale" class="w-full h-full object-cover" alt="Promotion 1"></div>
+                        <div class="slide h-full"><img src="https://placehold.co/1200x500/60a5fa/ffffff?text=Electronics+Fest" class="w-full h-full object-cover" alt="Promotion 2"></div>
+                        <div class="slide h-full"><img src="https://placehold.co/1200x500/f87171/ffffff?text=Fashion+Frenzy" class="w-full h-full object-cover" alt="Promotion 3"></div>
+                    </div>
+                    <div class="slider-dots"></div>
+                </div>
+
+                <div class="grid grid-cols-3 sm:grid-cols-6 gap-4 bg-white p-6 rounded-lg shadow mb-8 text-center">
+                    ${categories.map(cat => `
+                        <a href="#" class="category-link flex flex-col items-center space-y-2 text-gray-700 transition-transform duration-300 transform hover:-translate-y-1 group" data-category="${cat.name}">
+                            <div class="h-16 w-16 md:h-20 md:w-20 rounded-full flex items-center justify-center ${cat.color} ${cat.hover} transition-all duration-300 group-hover:shadow-lg">
+                                <i class="fas ${cat.icon} text-2xl md:text-3xl"></i>
+                            </div>
+                            <span class="font-semibold text-sm group-hover:text-blue-600">${cat.name}</span>
+                        </a>
+                    `).join('')}
+                </div>
+
+                 <div class="flex justify-center items-center gap-4 mb-8">
+                    <button id="aiAssistantBtn" class="bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold py-3 px-6 rounded-full hover:shadow-lg transition-shadow">
+                        ✨ AI Shopping Assistant
+                    </button>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-4 justify-between items-center mb-6 bg-white p-4 rounded-lg shadow">
+                     <div class="flex items-center gap-4">
+                        <button id="back-to-all-btn" class="hidden bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">&larr; Back</button>
+                        <h2 id="products-heading" class="text-2xl font-bold text-gray-800">All Products</h2>
+                    </div>
+                     <div class="flex gap-4">
+                        <button id="filter-btn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300"><i class="fas fa-filter mr-2"></i>Filter</button>
+                        <select id="sort-select" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            <option value="default">Sort By</option>
+                            <option value="price-asc">Price: Low to High</option>
+                            <option value="price-desc">Price: High to Low</option>
+                            <option value="rating-desc">Rating: High to Low</option>
+                        </select>
+                     </div>
+                </div>
+                
+                <div id="page-content">
+                    <div id="all-products-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"></div>
+                </div>
+                
+                <section id="recently-viewed-section" class="mt-12 hidden">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">👀 Recently Viewed</h2>
+                    <div id="recently-viewed-grid" class="scroll-container pb-4">
+                        </div>
+                </section>
+                `;
+            setupSlider();
+            updateDisplayedProducts(); // Initial render
+
+            if (currentUser) {
+                renderPersonalizedHomepage();
+            }
+
+            // After rendering, apply search if provided from another page
+            if (options.searchTerm) {
+                const searchInput = document.getElementById('desktopSearchInput');
+                const mobileSearchInput = document.getElementById('mobileSearchInput');
+                if (searchInput) searchInput.value = options.searchTerm;
+                if (mobileSearchInput) mobileSearchInput.value = options.searchTerm;
+                updateDisplayedProducts(options.searchTerm.toLowerCase().trim());
+            }
+
+            document.getElementById('sort-select').addEventListener('change', () => updateDisplayedProducts());
+            document.getElementById('aiAssistantBtn').addEventListener('click', renderAiAssistantModal);
+            document.getElementById('filter-btn').addEventListener('click', renderFilterModal);
+            document.querySelectorAll('.category-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const category = e.currentTarget.dataset.category;
+                    updateDisplayedProducts(null, category);
+                });
+            });
+            document.getElementById('back-to-all-btn').addEventListener('click', () => {
+                updateDisplayedProducts();
+            });
+            renderRecentlyViewed();
+        };
+        
+        const renderBlogPage = () => {
+            mainContent.innerHTML = `
+                 <div class="bg-white p-8 rounded-lg shadow-lg max-w-5xl mx-auto">
+                    <div class="text-center mb-12">
+                        <h1 class="text-4xl font-bold text-gray-900 mb-4">📢 JCOET Store Blog</h1>
+                        <p class="text-lg text-gray-600">News, announcements, and stories from our community.</p>
+                    </div>
+                    <div class="space-y-12">
+                        ${[
+                            { title: 'Grand Opening!', date: 'October 1, 2024', author: 'The Founders', content: 'We are thrilled to announce the official launch of the JCOET Store! Our mission is to create a seamless shopping experience for the entire campus. A big thank you to everyone who supported us on this journey.'},
+                            { title: 'Featured Seller: Priya Sharma', date: 'September 28, 2024', author: 'Admin', content: 'This week, we\'re shining a spotlight on Priya Sharma, a third-year computer science student who sells amazing handcrafted digital art and planners. Check out her products in the "Stationery" section!'},
+                            { title: 'How to Prepare for Your End-of-Semester Exams', date: 'September 22, 2024', author: 'Guest Author', content: 'Exam season is upon us! We\'ve compiled a list of the best study guides, stationery, and late-night snacks available right here on the JCOET store to help you ace your finals. Good luck!'}
+                        ].map(post => `
+                            <article class="border-b pb-8">
+                                <h2 class="text-3xl font-semibold text-gray-800 hover:text-blue-600 mb-2"><a href="#">${post.title}</a></h2>
+                                <p class="text-gray-500 text-sm mb-4">Posted on ${post.date} by ${post.author}</p>
+                                <p class="text-gray-700 leading-relaxed">${post.content}</p>
+                                <a href="#" class="text-blue-500 hover:underline font-semibold mt-4 inline-block">Read More &rarr;</a>
+                            </article>
+                        `).join('')}
+                    </div>
+                 </div>
+            `;
+        };
+
+        const renderSellerPortalPage = () => {
+             mainContent.innerHTML = `
+                <div class="bg-white p-8 rounded-lg shadow-lg max-w-4xl mx-auto">
+                    <div class="text-center mb-12">
+                        <h1 class="text-4xl font-bold text-gray-900 mb-4">🤝 Become a Seller</h1>
+                        <p class="text-lg text-gray-600">Join our community of student entrepreneurs and start selling your products on the JCOET Store!</p>
+                    </div>
+                    <form id="seller-application-form">
+                         <h2 class="text-2xl font-semibold mb-6 text-gray-800 border-b pb-4">Your Information</h2>
+                         <div class="grid md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                <input type="text" class="w-full rounded-md border-gray-300" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                                <input type="email" class="w-full rounded-md border-gray-300" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Branch & Year</label>
+                                <input type="text" placeholder="e.g., Comp Sci, 3rd Year" class="w-full rounded-md border-gray-300" required>
+                            </div>
+                         </div>
+                         <h2 class="text-2xl font-semibold mb-6 text-gray-800 border-b pb-4">About Your Store</h2>
+                         <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">What kind of products do you want to sell?</label>
+                                <textarea rows="4" class="w-full rounded-md border-gray-300" placeholder="e.g., Handcrafted notes, project components, custom art, etc." required></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700">Submit Application</button>
+                         </div>
+                    </form>
+                </div>
+             `;
+             document.getElementById('seller-application-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                alert('Thank you! Your application has been submitted for review.');
+                e.target.reset();
+             });
+        };
+
+        const renderProjectShowcasePage = () => {
+            mainContent.innerHTML = `
+                <div class="bg-white p-8 rounded-lg shadow-lg max-w-6xl mx-auto">
+                    <div class="text-center mb-12">
+                        <h1 class="text-4xl font-bold text-gray-900 mb-4">🚀 Student Project Showcase</h1>
+                        <p class="text-lg text-gray-600">See what your peers are creating with items from the JCOET Store!</p>
+                        <button id="submit-project-btn" class="mt-4 bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Submit Your Project</button>
+                    </div>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        ${studentProjects.map(project => `
+                            <div class="bg-gray-50 rounded-lg shadow-md overflow-hidden group">
+                                <img src="${project.image}" alt="${project.title}" class="w-full h-48 object-cover">
+                                <div class="p-4">
+                                    <h3 class="text-xl font-bold mb-2">${project.title}</h3>
+                                    <p class="text-sm text-gray-500 mb-2">By ${project.student}</p>
+                                    <p class="text-gray-700 text-sm">${project.description}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            document.getElementById('submit-project-btn').addEventListener('click', renderProjectSubmitModal);
+        };
+        
+        const renderProfilePage = () => {
+            if (!currentUser) {
+                navigate('home');
+                return;
+            }
+            mainContent.innerHTML = `
+                <div class="bg-white p-8 rounded-lg shadow-lg max-w-5xl mx-auto">
+                    <div class="flex flex-col md:flex-row items-center md:items-start gap-8 mb-8 border-b pb-8">
+                        <div class="text-5xl bg-blue-100 text-blue-600 rounded-full h-24 w-24 flex items-center justify-center font-bold">
+                            ${currentUser.name.charAt(0)}
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900">${currentUser.name}</h1>
+                            <p class="text-gray-600">${currentUser.email}</p>
+                             <p class="text-amber-500 font-bold mt-2"><i class="fas fa-star mr-1"></i> ${currentUser.points} JCOET Points</p>
+                            <button id="logout-btn" class="mt-4 text-sm text-red-500 hover:underline">Log Out</button>
+                        </div>
+                    </div>
+
+                    <div class="flex border-b">
+                        <button class="profile-tab active flex-1 text-center p-4 font-semibold" data-tab="wishlist">My Wishlist</button>
+                        <button class="profile-tab flex-1 text-center p-4 font-semibold" data-tab="orders">My Orders</button>
+                        <button class="profile-tab flex-1 text-center p-4 font-semibold" data-tab="rewards">Rewards</button>
+                    </div>
+
+                    <div id="profile-content" class="mt-6">
+                       </div>
+                </div>
+            `;
+            
+            const renderWishlist = () => {
+                const wishlistProducts = products.filter(p => wishlist.includes(p.id));
+                const container = document.getElementById('profile-content');
+                if (wishlistProducts.length > 0) {
+                     container.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${wishlistProducts.map(renderProductCard).join('')}</div>`;
+                } else {
+                     container.innerHTML = `
+                        <div class="text-center py-10">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">Your wishlist is empty</h3>
+                            <p class="mt-1 text-sm text-gray-500">Start adding products you love.</p>
+                            <div class="mt-6">
+                                <button type="button" class="home-nav-btn inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                    Continue Shopping
+                                </button>
+                            </div>
+                        </div>`;
+                }
+            };
+            
+            const renderOrders = () => {
+                const container = document.getElementById('profile-content');
+                 container.innerHTML = `<p class="text-center text-gray-500 py-10">You have no past orders.</p>`; // Mock content
+            };
+
+            const renderRewards = () => {
+                 const container = document.getElementById('profile-content');
+                 container.innerHTML = `
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h2 class="text-2xl font-bold mb-4">🏆 Points & Rewards</h2>
+                        <div class="mb-6">
+                            <h3 class="font-semibold">How to Earn Points:</h3>
+                            <ul class="list-disc list-inside text-gray-600">
+                                <li>Earn 1 point for every ₹10 spent.</li>
+                                <li>Earn 25 points for writing a product review.</li>
+                                <li>Earn 5 points for daily login (coming soon!).</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold">Redeem Your Points:</h3>
+                             <div class="mt-2 p-4 bg-white rounded-lg shadow-sm border">
+                                <p class="font-bold">₹50 Off Coupon</p>
+                                <p class="text-sm text-gray-600">Redeem for 500 Points</p>
+                            </div>
+                        </div>
+                    </div>
+                 `;
+            };
+
+            document.querySelectorAll('.profile-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                    if (e.currentTarget.dataset.tab === 'wishlist') renderWishlist();
+                    else if (e.currentTarget.dataset.tab === 'orders') renderOrders();
+                    else if (e.currentTarget.dataset.tab === 'rewards') renderRewards();
+                });
+            });
+
+            document.getElementById('logout-btn').addEventListener('click', logoutUser);
+            renderWishlist(); // Show wishlist by default
+        };
+        
+        const renderAboutPage = () => { 
+            mainContent.innerHTML = `
+            <div class="bg-white p-8 rounded-lg shadow-lg max-w-5xl mx-auto text-gray-700 leading-relaxed">
+                <div class="text-center mb-12">
+                     <h1 class="text-4xl font-bold text-gray-900 mb-4">🛍 About Us – JCOET Store</h1>
+                </div>
+                <p class="mb-6 text-lg">Welcome to JCOET Store, an exclusive online marketplace created by the students of Jagadambha College of Engineering and Technology, Yavatmal. Our goal is simple – to provide a one-stop platform where students, faculty, and campus community members can easily buy, sell, and explore products with convenience and trust.</p>
+                
+                <div class="grid md:grid-cols-2 gap-8 my-10">
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-3">🎯 Our Mission</h2>
+                        <p>At JCOET Store, we aim to make shopping simple, affordable, and accessible within our college community. Whether it’s books, electronics, fashion, or daily essentials, our mission is to connect buyers and sellers in a safe and reliable digital environment.</p>
+                    </div>
+                     <div class="bg-gray-50 p-6 rounded-lg">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-3">👁 Our Vision</h2>
+                        <p>To build a modern and student-driven e-commerce platform that not only fulfills campus needs but also encourages entrepreneurship, innovation, and digital learning among students.</p>
+                    </div>
+                </div>
+
+                <h2 class="text-3xl font-bold text-gray-800 text-center my-10">💡 What We Offer</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 text-center mb-10">
+                     ${[{icon:'fa-book', text:'Books & Stationery'}, {icon:'fa-tshirt', text:'Fashion & Lifestyle'}, {icon:'fa-laptop', text:'Electronics & Gadgets'}, {icon:'fa-shopping-basket', text:'Daily Essentials'}, {icon:'fa-store', text:'College Merchandise'}].map(item => `
+                        <div class="bg-blue-50 p-4 rounded-lg"><i class="fas ${item.icon} text-3xl text-blue-500 mb-2"></i><p>${item.text}</p></div>
+                     `).join('')}
+                </div>
+                
+                <div class="mb-10">
+                    <h2 class="text-3xl font-bold text-gray-800 text-center my-10">🌟 Meet the Team</h2>
+                    <div class="flex flex-wrap justify-center gap-8">
+                        ${['Harshal Dhumane', 'Bhushan Angaitkar', 'Atharva Dhole', 'Harshal Misade', 'Daksh Dhawane'].map(name => `
+                            <div class="text-center">
+                                <div class="bg-gray-200 rounded-full h-24 w-24 mx-auto mb-2 flex items-center justify-center"><i class="fas fa-user text-4xl text-gray-500"></i></div>
+                                <p class="font-semibold">${name}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="text-center bg-gray-100 p-8 rounded-lg">
+                     <h2 class="text-2xl font-bold text-gray-800 mb-3">🤝 Join Our Journey</h2>
+                     <p class="max-w-3xl mx-auto">We believe that JCOET Store is more than just an e-commerce site – it’s a platform to connect, collaborate, and grow together as a community. Be a part of this exciting journey and help us shape the future of digital commerce at our college.</p>
+                </div>
+            </div>`;
+        };
+        
+        const renderContactPage = () => { 
+            mainContent.innerHTML = `
+            <div class="bg-white p-8 rounded-lg shadow-lg max-w-4xl mx-auto">
+                 <div class="text-center mb-12">
+                    <h1 class="text-4xl font-bold text-gray-900 mb-4">📞 Contact Us</h1>
+                    <p class="text-lg text-gray-600">We'd love to hear from you! Reach out with any questions or feedback.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h2 class="text-2xl font-semibold mb-4 text-gray-800">Get in Touch</h2>
+                        <p class="mb-2"><i class="fas fa-envelope mr-2 text-blue-500"></i> <a href="mailto:support@jcoetstore.com" class="hover:underline">support@jcoetstore.com</a></p>
+                        <p class="mb-2"><i class="fas fa-phone mr-2 text-blue-500"></i> +91 9011015485</p>
+                        <p><i class="fas fa-map-marker-alt mr-2 text-blue-500"></i> JCOET, Yavatmal, Maharashtra</p>
+                    </div>
+                     <form id="contact-form" class="bg-gray-50 p-6 rounded-lg">
+                         <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Your Name</label>
+                            <input type="text" class="w-full rounded-md border-gray-300" required>
+                         </div>
+                         <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Your Email</label>
+                            <input type="email" class="w-full rounded-md border-gray-300" required>
+                         </div>
+                         <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Message</label>
+                            <textarea rows="4" class="w-full rounded-md border-gray-300" required></textarea>
+                         </div>
+                         <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 transition-colors">Send Message</button>
+                         <div id="contact-form-feedback" class="text-center mt-2 h-5"></div>
+                     </form>
+                </div>
+            </div>
+            `;
+        };
+        
+        const renderPrivacyPolicyPage = () => { 
+            mainContent.innerHTML = `
+                <div class="bg-white p-8 rounded-lg shadow-lg max-w-5xl mx-auto text-gray-700">
+                     <h1 class="text-3xl font-bold text-center mb-8">🔒 Privacy Policy – JCOET Store</h1>
+                     <div class="space-y-6">
+                        <div>
+                            <h2 class="text-xl font-semibold mb-2">1. Information We Collect</h2>
+                            <p>Name, email address, phone number, and college details (for account creation). Transaction details when you purchase or sell products. Basic usage data (to improve website performance).</p>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-semibold mb-2">2. How We Use Your Information</h2>
+                            <p>To process orders and deliver products. To provide customer support and respond to queries. To improve our services and personalize user experience. To send important updates or notifications.</p>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-semibold mb-2">3. Information Sharing</h2>
+                            <p>We do not sell or rent your personal information to third parties. Information is shared only with trusted vendors, delivery partners, or as required by law.</p>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-semibold mb-2">4. Data Protection</h2>
+                            <p>We use secure methods to store and transmit data. Access to personal information is limited to authorized team members only.</p>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-semibold mb-2">5. Your Rights</h2>
+                            <p>You can update or delete your account information anytime. You may contact us for any concerns regarding data privacy. For privacy-related queries, contact: <a href="mailto:privacy@jcoetstore.com" class="text-blue-600 hover:underline">privacy@jcoetstore.com</a></p>
+                        </div>
+                     </div>
+                </div>
+            `;
+        };
+        
+        const renderFaqsPage = () => { 
+            mainContent.innerHTML = `
+                <div class="bg-white p-8 rounded-lg shadow-lg max-w-5xl mx-auto">
+                    <h1 class="text-3xl font-bold text-center mb-8">❓ Frequently Asked Questions (FAQs)</h1>
+                    <div class="space-y-4">
+                        ${[
+                            {q: '1. What is JCOET Store?', a: 'JCOET Store is an e-commerce platform created by students of Jagadambha College of Engineering & Technology, Yavatmal, where students and staff can buy and sell products easily.'},
+                            {q: '2. Who can use JCOET Store?', a: 'Currently, it is designed for students, faculty, and staff of JCOET.'},
+                            {q: '3. What type of products are available?', a: 'You can find books, stationery, electronics, fashion, daily essentials, and college merchandise.'},
+                            {q: '4. Is JCOET Store safe to use?', a: 'Yes ✅. All transactions are monitored and kept secure. We do not share your personal data with outsiders.'},
+                            {q: '5. How can I place an order?', a: 'Browse products, add them to your cart, proceed to checkout with your details, and confirm your order.'},
+                            {q: '6. Can I sell my own products?', a: 'Yes! Students can register as sellers and upload products (with admin approval).'},
+                            {q: '7. What if I face an issue with my order?', a: 'You can contact our support team via the “Help & Support” section or email us at support@jcoetstore.com.'},
+                        ].map((faq, i) => `
+                            <div class="border rounded-lg">
+                                <button class="accordion-btn w-full text-left p-4 font-semibold flex justify-between items-center">
+                                    <span>${faq.q}</span>
+                                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                                </button>
+                                <div class="accordion-content px-4 pb-4 text-gray-600">
+                                    <p>${faq.a}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        };
+
+        // --- Navigation Logic ---
+        const navigate = (page, options = {}) => {
+            window.scrollTo(0, 0);
+            updateActiveLink(page);
+            mobileMenu.classList.add('hidden');
+            const pages = {
+                home: renderHomePage, blog: renderBlogPage, about: renderAboutPage,
+                contact: renderContactPage, privacy: renderPrivacyPolicyPage, faqs: renderFaqsPage,
+                seller: renderSellerPortalPage, profile: renderProfilePage, showcase: renderProjectShowcasePage
+            };
+            (pages[page] || pages.home)(options);
+        };
+
+        // Initialize nav links
+        Object.keys(navLinks).forEach(page => {
+            navLinks[page].forEach(link => {
+                if(link) {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        navigate(page);
+                    });
+                }
+            });
+        });
+
+        // --- Product Display & Filtering ---
+        const updateDisplayedProducts = (searchTerm = null, category = null, filters = null) => {
+            const sortBy = document.getElementById('sort-select')?.value || 'default';
+            let productsToDisplay = [...products];
+            const heading = document.getElementById('products-heading');
+            const backBtn = document.getElementById('back-to-all-btn');
+
+            let currentCategory = category;
+            const currentFilters = filters || JSON.parse(sessionStorage.getItem('activeFilters')) || {};
+            
+            // Handle active category from filters if not passed directly
+            if (currentFilters.categories && currentFilters.categories.length > 0 && !category && !searchTerm) {
+                currentCategory = currentFilters.categories[0]; 
+            }
+
+            if (searchTerm) {
+                productsToDisplay = productsToDisplay.filter(p => p.name.toLowerCase().includes(searchTerm));
+                heading.textContent = `Results for "${searchTerm}"`;
+                backBtn.classList.remove('hidden');
+            } else if (currentCategory) {
+                 productsToDisplay = productsToDisplay.filter(p => p.category === currentCategory);
+                 heading.textContent = `${currentCategory} Products`;
+                 backBtn.classList.remove('hidden');
+            } else {
+                heading.textContent = 'All Products';
+                backBtn.classList.add('hidden');
+            }
+
+            // Apply price filter
+            if (currentFilters.maxPrice) {
+                productsToDisplay = productsToDisplay.filter(p => p.price <= currentFilters.maxPrice);
+            }
+
+            if (sortBy === 'price-asc') productsToDisplay.sort((a, b) => a.price - b.price);
+            if (sortBy === 'price-desc') productsToDisplay.sort((a, b) => b.price - a.price);
+            if (sortBy === 'rating-desc') productsToDisplay.sort((a, b) => b.rating - a.rating);
+            
+            renderProductSection(productsToDisplay, document.getElementById('all-products-grid'));
+        };
+
+        // --- Render Single Product Card ---
+        function renderProductCard(product, isRecommendation = false) {
+            const isInWishlist = wishlist.includes(product.id);
+            return `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 flex flex-col group">
+                    <div class="relative">
+                        <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover cursor-pointer" data-product-id="${product.id}" loading="lazy">
+                        <button class="wishlist-btn absolute top-2 right-2 bg-white rounded-full h-8 w-8 flex items-center justify-center text-gray-500 hover:text-red-500 ${isInWishlist ? 'active' : ''}" data-product-id="${product.id}">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
+                            <button class="view-product-btn text-white text-sm font-semibold py-2 px-4 rounded-full bg-amber-500 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300" data-product-id="${product.id}">Quick View</button>
+                        </div>
+                    </div>
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h3 class="font-semibold text-base text-gray-800 mb-2 truncate flex-grow">${product.name}</h3>
+                        <div class="flex items-center mb-2">
+                            ${[...Array(5)].map((_, i) => `<i class="fas fa-star ${i < product.rating ? 'text-yellow-400' : 'text-gray-300'} text-xs"></i>`).join('')}
+                            <span class="text-xs text-gray-500 ml-2">(${product.rating}.0)</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-lg text-gray-900">₹${product.price.toLocaleString('en-IN')}</span>
+                            <button class="add-to-cart-btn bg-amber-100 text-amber-800 text-2xl font-semibold h-10 w-10 rounded-full hover:bg-amber-200 transition-colors" data-product-id="${product.id}" data-from-rec="${isRecommendation}">
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+        }
+        
+        // --- Render Product Section ---
+        function renderProductSection(productsToRender, gridElement) {
+            if (!gridElement) return;
+            if (productsToRender.length > 0) {
+                gridElement.innerHTML = productsToRender.map(renderProductCard).join('');
+            } else {
+                gridElement.innerHTML = `
+                    <div class="col-span-full text-center py-10">
+                         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                          <h3 class="mt-2 text-sm font-medium text-gray-900">No products found</h3>
+                          <p class="mt-1 text-sm text-gray-500">Try adjusting your search or filters.</p>
+                          <div class="mt-6">
+                            <button type="button" class="back-to-all-btn-empty inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                Clear Filters
+                            </button>
+                          </div>
+                    </div>
+                `;
+            }
+        }
+
+        // --- Recently Viewed ---
+        function addToRecentlyViewed(productId) {
+            recentlyViewed = recentlyViewed.filter(id => id !== productId);
+            recentlyViewed.unshift(productId);
+            if (recentlyViewed.length > 8) {
+                recentlyViewed.pop();
+            }
+            sessionStorage.setItem('recentlyViewed', JSON.stringify(recentlyViewed));
+            renderRecentlyViewed();
+        }
+        function renderRecentlyViewed() {
+            const container = document.getElementById('recently-viewed-grid');
+            const section = document.getElementById('recently-viewed-section');
+            if (!container || !section) return;
+
+            const viewedProducts = recentlyViewed.map(id => products.find(p => p.id === id)).filter(Boolean);
+            if(viewedProducts.length > 0) {
+                container.innerHTML = viewedProducts.map(p => `<div class="scroll-item">${renderProductCard(p)}</div>`).join('');
+                section.classList.remove('hidden');
+            } else {
+                section.classList.add('hidden');
+            }
+        }
+
+        // --- Wishlist Logic ---
+        const toggleWishlist = (productId, btn) => {
+            const index = wishlist.indexOf(productId);
+            if (index > -1) {
+                wishlist.splice(index, 1); // Remove from wishlist
+                btn.classList.remove('active');
+            } else {
+                wishlist.push(productId); // Add to wishlist
+                btn.classList.add('active');
+            }
+        };
+
+        // --- Product Modal ---
+        function renderProductModal(productId) {
+            const product = products.find(p => p.id === productId);
+            addToRecentlyViewed(productId); // Add to recently viewed
+
+            const showReviewSummary = product.reviews.length >= 3;
+            const showProjectIdeas = ['Electronics', 'Books'].includes(product.category);
+
+            productModalEl.innerHTML = `
+            <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-4xl transform scale-95 opacity-0 my-8">
+                <div class="p-4 md:p-0 md:grid md:grid-cols-2 gap-6 items-start">
+                    <div class="p-4"><img src="${product.image.replace('400x400', '600x600')}" alt="${product.name}" class="w-full h-auto object-cover rounded-lg"></div>
+                    <div class="p-6 relative">
+                        <button class="close-modal-btn absolute top-2 right-2 text-3xl text-gray-500 hover:text-gray-800">&times;</button>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2">${product.name}</h2>
+                        <div class="flex items-center mb-4">
+                            ${[...Array(5)].map((_, i) => `<i class="fas fa-star ${i < product.rating ? 'text-yellow-400' : 'text-gray-300'}"></i>`).join('')}
+                            <span class="text-sm text-gray-600 ml-3">(${product.reviews.length} Reviews)</span>
+                        </div>
+                        <div id="description-container-${product.id}" class="mb-4 min-h-[70px] text-gray-600">
+                           <div id="description-loader-${product.id}" class="loader mx-auto"></div>
+                           <p id="description-content-${product.id}" class="hidden"></p>
+                        </div>
+                        <span class="text-3xl font-bold text-amber-500">₹${product.price.toLocaleString('en-IN')}</span>
+                        <div class="mt-4 flex items-center space-x-4">
+                            <button class="add-to-cart-btn flex-1 bg-amber-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-600" data-product-id="${product.id}">Add to Cart</button>
+                            <button class="buy-now-btn flex-1 bg-gray-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-900" data-product-id="${product.id}">Buy Now</button>
+                        </div>
+                        
+                        <div class="mt-6 space-y-4">
+                             <div class="bg-gray-50 p-4 rounded-lg">
+                                <button id="price-compare-btn" class="font-semibold text-indigo-600 w-full text-left" data-product-id="${product.id}" data-product-price="${product.price}">
+                                    <i class="fas fa-chart-line mr-2"></i>Compare Prices
+                                </button>
+                                <div id="price-compare-container-${product.id}" class="mt-2 text-sm hidden">
+                                    </div>
+                            </div>
+
+                            ${showReviewSummary ? `
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <button id="review-summary-btn" class="font-semibold text-indigo-600 w-full text-left" data-product-id="${product.id}">✨ Summarize Reviews</button>
+                                <div id="review-summary-container-${product.id}" class="mt-2 text-sm"></div>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="mt-6 border-t pt-4">
+                            <h3 class="font-semibold mb-2">Rate this product</h3>
+                            <div class="rating-stars mb-2" data-product-id="${product.id}">
+                                ${[...Array(5)].map((_, i) => `<i class="fa-solid fa-star" data-value="${i+1}"></i>`).join('')}
+                            </div>
+                            <form class="review-form" data-product-id="${product.id}">
+                                <textarea class="w-full border-gray-300 rounded-md" placeholder="Write your review..."></textarea>
+                                <button type="submit" class="w-full bg-blue-500 text-white font-semibold py-2 rounded-lg mt-2 hover:bg-blue-600">Submit Review</button>
+                            </form>
+                            <div id="review-feedback-${product.id}" class="text-sm mt-2 h-5"></div>
+                            <div id="reviews-container-${product.id}" class="mt-4 max-h-40 overflow-y-auto space-y-2">
+                                ${product.reviews.map(r => `<div class="bg-gray-100 p-2 rounded-lg text-sm"><strong>${r.author}:</strong> ${r.text}</div>`).join('') || '<p class="text-sm text-gray-500">No reviews yet.</p>'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+            openModal(productModalEl);
+            handleGenerateDescription(product.id); // Auto-generate description
+        }
+        
+        // --- Price Comparison ---
+        const fetchPriceComparisonData = async (basePrice) => {
+            // Simulate network delay for fetching data
+            await new Promise(res => setTimeout(res, 1000));
+
+            // Simulate price variations where other stores are always more expensive.
+            const variation = 0.10; // 10% random variation
+            const amazonPrice = basePrice * (1.05 + (Math.random() * variation)); // 5% to 15% more expensive
+            const flipkartPrice = basePrice * (1.08 + (Math.random() * variation)); // 8% to 18% more expensive
+            const meeshoPrice = basePrice * (1.03 + (Math.random() * variation)); // 3% to 13% more expensive
+
+            return {
+                'JCOET Store': basePrice,
+                'Amazon': Math.round(amazonPrice),
+                'Flipkart': Math.round(flipkartPrice),
+                'Meesho': Math.round(meeshoPrice),
+            };
+        };
+
+        function renderPriceComparisonChart(data, container) {
+            const prices = Object.values(data);
+            const maxPrice = Math.max(...prices);
+            const minPrice = Math.min(...prices);
+            
+            const chartHTML = `
+                <div class="space-y-2 mt-4">
+                    ${Object.entries(data).map(([store, price]) => {
+                        const barWidth = Math.max((price / maxPrice) * 100, 10); // Ensure even small bars are visible
+                        const isCheapest = price === minPrice;
+                        return `
+                        <div class="flex items-center gap-2 animate-fade-in">
+                            <div class="w-24 text-xs font-medium text-gray-600">${store}</div>
+                            <div class="flex-1 bg-gray-200 rounded-full h-6">
+                                <div class="${isCheapest ? 'bg-green-500' : 'bg-blue-500'} h-6 rounded-full text-white text-xs flex items-center justify-end pr-2 font-semibold transition-all duration-500" style="width: ${barWidth}%;">
+                                    ₹${price.toLocaleString('en-IN')}
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    }).join('')}
+                </div>
+                 <p class="text-xs text-gray-500 mt-2">*Prices are illustrative and may not be real-time.</p>
+            `;
+            container.innerHTML = chartHTML;
+        }
+        
+        async function handlePriceComparison(btn) {
+            const productId = parseInt(btn.dataset.productId);
+            const basePrice = parseInt(btn.dataset.productPrice);
+            const container = document.getElementById(`price-compare-container-${productId}`);
+            if (!container) return;
+            
+            btn.classList.add('hidden');
+            container.classList.remove('hidden');
+            container.innerHTML = `<div class="loader mx-auto"></div>`;
+
+            const comparisonData = await fetchPriceComparisonData(basePrice);
+            
+            if (comparisonData) {
+                renderPriceComparisonChart(comparisonData, container);
+            } else {
+                container.innerHTML = `<p class="text-gray-500">Could not fetch price data.</p>`;
+            }
+        }
+
+
+        // --- Rating & Review Logic ---
+        const handleRating = (productId, rating) => {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+             console.log(`User rated product ${productId} with ${rating} stars.`);
+        };
+        
+        const handleReviewSubmit = (productId, reviewText) => {
+            const product = products.find(p => p.id === productId);
+            const feedbackEl = document.getElementById(`review-feedback-${productId}`);
+            if (!feedbackEl) return;
+
+            if (!currentUser) {
+                feedbackEl.innerHTML = `<p class="text-red-500">Please <button class="underline font-semibold" id="login-from-review">sign in</button> to leave a review.</p>`;
+                return;
+            }
+            if (!reviewText.trim()) {
+                feedbackEl.innerHTML = `<p class="text-red-500">Please write something before submitting.</p>`;
+                setTimeout(() => { feedbackEl.innerHTML = ''; }, 3000);
+                return;
+            }
+
+            product.reviews.unshift({ author: currentUser.name, text: reviewText });
+            currentUser.points += 25; // Add points for review
+            
+            renderProductModal(productId);
+            setTimeout(() => {
+                 const newFeedbackEl = document.getElementById(`review-feedback-${productId}`);
+                 if (newFeedbackEl) {
+                    newFeedbackEl.innerHTML = `<p class="text-green-500">Thank you! +25 Points Awarded!</p>`;
+                    setTimeout(() => { newFeedbackEl.innerHTML = ''; }, 3000);
+                 }
+            }, 100);
+        };
+        
+        function renderCartModal() {
+            const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            let itemsHTML = cart.map(item => `
+                <div class="flex items-center justify-between py-2 border-b">
+                    <div class="flex items-center">
+                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-md mr-4">
+                        <div>
+                            <h4 class="font-semibold">${item.name}</h4>
+                            <p class="text-sm text-gray-500">₹${item.price.toLocaleString('en-IN')}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button class="quantity-change text-lg font-bold" data-product-id="${item.id}" data-change="-1">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="quantity-change text-lg font-bold" data-product-id="${item.id}" data-change="1">+</button>
+                        <button class="remove-from-cart text-red-500 text-xl" data-product-id="${item.id}">&times;</button>
+                    </div>
+                </div>`).join('');
+            
+            cartModalEl.innerHTML = `
+            <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl transform scale-95 opacity-0 my-8">
+                <div class="p-6">
+                    <div class="flex justify-between items-center border-b pb-4 mb-4">
+                        <h2 class="text-2xl font-bold">Your Cart</h2>
+                        <button class="close-modal-btn text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+                    </div>
+                    <div class="space-y-4 max-h-96 overflow-y-auto pr-2">${cart.length > 0 ? itemsHTML : `
+                        <div class="text-center py-10">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                              <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">Your cart is empty</h3>
+                            <p class="mt-1 text-sm text-gray-500">Looks like you haven't added anything yet.</p>
+                            <div class="mt-6">
+                              <button type="button" class="home-nav-btn inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                Start Shopping
+                              </button>
+                            </div>
+                        </div>
+                    `}</div>
+                    <div class="mt-6 border-t pt-4 ${cart.length === 0 ? 'hidden' : ''}">
+                        <div id="cart-recommendations-container" class="my-4 p-4 bg-gray-50 rounded-lg">
+                            <button id="cart-recommendations-btn" class="text-indigo-600 font-semibold text-sm">✨ Find Complementary Items</button>
+                            <div id="cart-recommendations-loader" class="hidden loader mx-auto my-2"></div>
+                            <div id="cart-recommendations-content"></div>
+                        </div>
+                        <div class="flex justify-between items-center text-xl font-bold">
+                            <span>Total</span>
+                            <span>₹${total.toLocaleString('en-IN')}</span>
+                        </div>
+                        <button id="proceedToCheckoutBtn" class="w-full bg-amber-500 text-white font-bold py-3 px-4 rounded-lg mt-4 hover:bg-amber-600">Proceed to Checkout</button>
+                    </div>
+                </div>
+            </div>`;
+            openModal(cartModalEl);
+        }
+
+        function renderCheckoutModal(step = 'address', orderDetails = null) {
+            let contentHTML = '';
+            const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+            switch(step) {
+                case 'address': 
+                    contentHTML = `
+                    <h3 class="text-xl font-bold mb-4">Delivery Option</h3>
+                    <div class="flex gap-4 mb-4">
+                        <label class="flex-1 p-4 border rounded-lg cursor-pointer has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500">
+                            <input type="radio" name="deliveryOption" value="home" class="sr-only" checked>
+                            <span class="font-semibold">Deliver to Address</span>
+                        </label>
+                        <label class="flex-1 p-4 border rounded-lg cursor-pointer has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500">
+                            <input type="radio" name="deliveryOption" value="campus" class="sr-only">
+                             <span class="font-semibold">Campus Pickup</span>
+                        </label>
+                    </div>
+                    <form id="addressForm">
+                        <div id="home-delivery-fields">
+                           <h3 class="text-lg font-semibold mb-2">Shipping Address</h3>
+                           <div class="grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-2">
+                                <div class="sm:col-span-2"><label class="block text-sm font-medium text-gray-700">Full Name</label><input type="text" name="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></div>
+                                <div class="sm:col-span-2"><label class="block text-sm font-medium text-gray-700">Mobile Number</label><input type="tel" name="mobile" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></div>
+                                <div class="sm:col-span-2"><label class="block text-sm font-medium text-gray-700">Address</label><input type="text" name="address" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></div>
+                                <div><label class="block text-sm font-medium text-gray-700">City</label><input type="text" name="city" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></div>
+                                <div><label class="block text-sm font-medium text-gray-700">Pincode</label><input type="text" name="pincode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></div>
+                           </div>
+                        </div>
+                        <div id="campus-pickup-fields" class="hidden">
+                            <h3 class="text-lg font-semibold mb-2">Select Pickup Point</h3>
+                            <select name="pickupPoint" class="w-full rounded-md border-gray-300 shadow-sm">
+                                <option>Library Entrance</option>
+                                <option>Main Canteen</option>
+                                <option>Hostel Block A</option>
+                                <option>Admin Building</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full mt-6 bg-amber-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-amber-600 transition-colors">Continue to Payment</button>
+                    </form>`; 
+                    break;
+                case 'payment': 
+                    contentHTML = `<h3 class="text-xl font-bold mb-4">Payment Method</h3>
+                    <form id="paymentForm">
+                        <div class="space-y-4">
+                            <div class="flex items-center p-4 border rounded-lg">
+                                <input id="upi" name="paymentMethod" type="radio" class="h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500" checked>
+                                <label for="upi" class="ml-3 block text-sm font-medium text-gray-700">PhonePe / UPI</label>
+                            </div>
+                            <div id="upi-details-form" class="p-4 border-t">
+                                <input type="text" id="upi-id" placeholder="Enter UPI ID" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                            </div>
+                            <div class="flex items-center p-4 border rounded-lg">
+                                <input id="cod" name="paymentMethod" type="radio" class="h-4 w-4 text-amber-600 border-gray-300">
+                                <label for="cod" class="ml-3 block text-sm font-medium text-gray-700">Cash on Delivery</label>
+                            </div>
+                        </div>
+                        <div class="mt-6 border-t pt-4 flex justify-between items-center text-lg font-bold">
+                            <span>Order Total:</span>
+                            <span>₹${total.toLocaleString('en-IN')}</span>
+                        </div>
+                        <div class="mt-4 flex flex-col-reverse sm:flex-row gap-2">
+                             <button type="button" id="back-to-address-btn" class="w-full sm:w-1/3 bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-lg hover:bg-gray-300">Back</button>
+                             <button id="placeOrderBtn" type="submit" class="w-full sm:flex-1 bg-amber-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-amber-600 disabled:bg-gray-400">Place Your Order</button>
+                        </div>
+                    </form>`; 
+                    break;
+                case 'processing':
+                     contentHTML = `<div class="text-center py-10"><div class="loader mx-auto"></div><p class="mt-4 text-gray-600">Processing your order...</p></div>`;
+                     break;
+                case 'confirmation': 
+                    contentHTML = `
+                    <div class="text-center py-10">
+                        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100"><i class="fas fa-check h-6 w-6 text-green-600"></i></div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 mt-4">Order Placed Successfully!</h3>
+                         <p class="text-green-600 font-semibold text-sm">+${Math.floor(orderDetails.total / 10)} Points Earned!</p>
+                        <div class="mt-4 text-left bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-bold mb-2">Order Summary:</h4>
+                            <ul class="text-sm space-y-1 mb-2">
+                                ${orderDetails.items.map(item => `<li>${item.name} (x${item.quantity})</li>`).join('')}
+                            </ul>
+                            <p class="font-bold border-t pt-2">Total: ₹${orderDetails.total.toLocaleString('en-IN')}</p>
+                            <p class="text-xs mt-2 text-gray-600">Delivering to: ${orderDetails.address.name}, ${orderDetails.address.fullAddress}</p>
+                        </div>
+                        <button id="closeConfirmation" class="mt-6 bg-amber-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-amber-600">Continue Shopping</button>
+                    </div>`;
+                    break;
+            }
+            checkoutModalEl.innerHTML = `<div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-lg transform scale-95 opacity-0 my-8"><div class="p-6 relative"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold">Checkout</h2><button class="close-modal-btn absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl">&times;</button></div>${contentHTML}</div></div>`;
+            openModal(checkoutModalEl);
+             if (step === 'payment') {
+                const upiDetailsForm = document.getElementById('upi-details-form');
+                const upiInput = document.getElementById('upi-id');
+                document.getElementById('paymentForm').addEventListener('change', (e) => {
+                    const isUpiSelected = e.target.id === 'upi';
+                    upiDetailsForm.style.display = isUpiSelected ? 'block' : 'none';
+                    upiInput.required = isUpiSelected;
+                });
+            } else if (step === 'address') {
+                 document.querySelectorAll('input[name="deliveryOption"]').forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        const isHome = e.target.value === 'home';
+                        document.getElementById('home-delivery-fields').style.display = isHome ? 'block' : 'none';
+                        document.getElementById('campus-pickup-fields').style.display = isHome ? 'none' : 'block';
+                         document.querySelectorAll('#home-delivery-fields input').forEach(input => input.required = isHome);
+                    });
+                 });
+            }
+        }
+        
+        function renderAuthModal(view = 'login') {
+            let contentHTML = '';
+            if (view === 'login') {
+                contentHTML = `<h3 class="text-xl font-bold mb-4 text-center">Sign In</h3><form id="loginForm"><div class="mb-4"><label class="block text-sm font-medium text-gray-700">Email</label><input type="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500" required></div><div class="mb-4"><label class="block text-sm font-medium text-gray-700">Password</label><input type="password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></div><button type="submit" class="w-full bg-amber-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-amber-600">Sign In</button></form><p class="text-center text-sm mt-4">New customer? <a href="#" id="show-signup" class="text-amber-600 hover:underline">Start here.</a></p>`;
+            } else {
+                contentHTML = `<h3 class="text-xl font-bold mb-4 text-center">Create Account</h3><form id="signupForm"><div class="mb-4"><input type="text" placeholder="Full Name" class="block w-full rounded-md border-gray-300 shadow-sm" required></div><div class="mb-4"><input type="email" placeholder="Email Address" class="block w-full rounded-md border-gray-300 shadow-sm" required></div><div class="mb-4"><input type="password" placeholder="Password" class="block w-full rounded-md border-gray-300 shadow-sm" required></div><button type="submit" class="w-full bg-amber-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-amber-600">Create Account</button></form><p class="text-center text-sm mt-4">Already have an account? <a href="#" id="show-login" class="text-amber-600 hover:underline">Sign in.</a></p>`;
+            }
+            authModalEl.innerHTML = `<div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-md transform scale-95 opacity-0 my-8"><div class="p-8 relative"><button class="close-modal-btn absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>${contentHTML}</div></div>`;
+            openModal(authModalEl);
+        }
+
+        function renderAiAssistantModal() {
+            aiAssistantModalEl.innerHTML = `
+            <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl transform scale-95 opacity-0 my-8">
+                <div class="p-6">
+                     <div class="flex justify-between items-center border-b pb-4 mb-4">
+                        <h2 class="text-2xl font-bold">✨ AI Shopping Assistant</h2>
+                        <button class="close-modal-btn text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+                    </div>
+                    <p class="text-gray-600 mb-4">What are you looking for today? (e.g., "a good book for a beginner coder")</p>
+                    <form id="ai-assistant-form">
+                        <textarea id="ai-prompt" class="w-full border-gray-300 rounded-md" rows="3" placeholder="Describe what you need..."></textarea>
+                        <button type="submit" class="w-full mt-2 bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700">Get Recommendations</button>
+                    </form>
+                    <div id="ai-assistant-loader" class="hidden loader mx-auto my-4"></div>
+                    <div id="ai-assistant-results" class="mt-4"></div>
+                </div>
+            </div>`;
+            openModal(aiAssistantModalEl);
+        }
+
+        function renderFilterModal() {
+            const activeFilters = JSON.parse(sessionStorage.getItem('activeFilters')) || {};
+            const maxPrice = activeFilters.maxPrice || 100000;
+
+            filterModalEl.innerHTML = `
+            <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-md transform scale-95 opacity-0 my-8">
+                 <form id="filter-form" class="p-6">
+                     <div class="flex justify-between items-center border-b pb-4 mb-4">
+                        <h2 class="text-2xl font-bold">Filters</h2>
+                        <button type="button" class="close-modal-btn text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+                    </div>
+                    <div class="mb-6">
+                        <h3 class="font-semibold mb-2">Category</h3>
+                        <div class="grid grid-cols-2 gap-2">
+                           ${categories.map(cat => `
+                            <div>
+                                <input type="radio" name="category" id="cat-${cat.name}" value="${cat.name}" class="mr-2" ${activeFilters.categories?.includes(cat.name) ? 'checked' : ''}>
+                                <label for="cat-${cat.name}">${cat.name}</label>
+                            </div>
+                           `).join('')}
+                        </div>
+                    </div>
+                     <div class="mb-6">
+                        <h3 class="font-semibold mb-2">Price Range</h3>
+                        <input type="range" id="price-range" min="100" max="100000" value="${maxPrice}" step="100">
+                        <div class="text-center mt-2">Up to <span id="price-value">₹${Number(maxPrice).toLocaleString('en-IN')}</span></div>
+                     </div>
+                     <div class="flex gap-2">
+                        <button type="button" id="clear-filters-btn" class="w-1/2 bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-lg hover:bg-gray-300">Clear</button>
+                        <button type="submit" class="w-1/2 bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Apply Filters</button>
+                     </div>
+                 </form>
+            </div>
+            `;
+            openModal(filterModalEl);
+            const priceRange = document.getElementById('price-range');
+            const priceValue = document.getElementById('price-value');
+            priceRange.addEventListener('input', () => {
+                priceValue.textContent = `₹${Number(priceRange.value).toLocaleString('en-IN')}`;
+            });
+        }
+
+        function renderProjectSubmitModal() {
+             projectSubmitModalEl.innerHTML = `
+                <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl transform scale-95 opacity-0 my-8">
+                    <form id="project-submit-form" class="p-6">
+                         <div class="flex justify-between items-center border-b pb-4 mb-4">
+                            <h2 class="text-2xl font-bold">Submit Your Project</h2>
+                            <button type="button" class="close-modal-btn text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+                        </div>
+                        <div class="space-y-4">
+                             <div>
+                                <label class="block text-sm font-medium text-gray-700">Project Title</label>
+                                <input type="text" class="w-full rounded-md border-gray-300" required>
+                            </div>
+                             <div>
+                                <label class="block text-sm font-medium text-gray-700">Your Name</label>
+                                <input type="text" value="${currentUser?.name || ''}" class="w-full rounded-md border-gray-300" required>
+                            </div>
+                             <div>
+                                <label class="block text-sm font-medium text-gray-700">Project Image URL</label>
+                                <input type="url" placeholder="https://placehold.co/..." class="w-full rounded-md border-gray-300" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Description</label>
+                                <textarea rows="3" class="w-full rounded-md border-gray-300" required></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full mt-4 bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Submit for Review</button>
+                    </form>
+                </div>
+             `;
+             openModal(projectSubmitModalEl);
+        }
+        
+        async function handleGenerateDescription(productId) {
+            const loader = document.getElementById(`description-loader-${productId}`);
+            const content = document.getElementById(`description-content-${productId}`);
+            
+            loader.classList.remove('hidden');
+            content.classList.add('hidden');
+
+            const product = products.find(p => p.id === productId);
+            const prompt = `Write a short, fun, and persuasive product description for "${product.name}" for a college student audience.`;
+            const schema = {
+              type: "OBJECT",
+              properties: {
+                description: { type: "STRING" }
+              }
+            };
+
+            const result = await callGeminiApi(prompt, schema);
+            if(result && result.description) {
+                content.textContent = result.description;
+            } else {
+                content.textContent = "A great product for all your needs!";
+            }
+            
+            loader.classList.add('hidden');
+            content.classList.remove('hidden');
+        }
+
+        async function handleReviewSummary(btn) {
+            const productId = parseInt(btn.dataset.productId);
+            const container = document.getElementById(`review-summary-container-${productId}`);
+            if (!container) return;
+
+            btn.classList.add('hidden');
+            container.innerHTML = `<div class="loader mx-auto"></div>`;
+
+            const product = products.find(p => p.id === productId);
+            const reviewTexts = product.reviews.map(r => r.text).join('\n - ');
+            const prompt = `Summarize the following product reviews into a "Pros" and "Cons" list:\n - ${reviewTexts}`;
+            const schema = {
+                type: "OBJECT",
+                properties: {
+                    pros: { type: "ARRAY", items: { type: "STRING" } },
+                    cons: { type: "ARRAY", items: { type: "STRING" } }
+                }
+            };
+
+            const result = await callGeminiApi(prompt, schema);
+
+            if (result && (result.pros?.length > 0 || result.cons?.length > 0)) {
+                container.innerHTML = `
+                    <div class="space-y-2">
+                        ${result.pros?.length > 0 ? `<div><h4 class="font-semibold text-green-600">Pros:</h4><ul class="list-disc list-inside">${result.pros.map(p => `<li>${p}</li>`).join('')}</ul></div>` : ''}
+                        ${result.cons?.length > 0 ? `<div><h4 class="font-semibold text-red-600">Cons:</h4><ul class="list-disc list-inside">${result.cons.map(c => `<li>${c}</li>`).join('')}</ul></div>` : ''}
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `<p class="text-gray-500">Could not generate a summary.</p>`;
+            }
+        }
+
+        async function handleProjectIdeas(btn) {
+            const productId = parseInt(btn.dataset.productId);
+            const container = document.getElementById(`project-ideas-container-${productId}`);
+            if (!container) return;
+            
+            btn.classList.add('hidden');
+            container.innerHTML = `<div class="loader mx-auto"></div>`;
+
+            const product = products.find(p => p.id === productId);
+            const prompt = `Generate 3 creative and simple project ideas for a college student using a "${product.name}".`;
+            const schema = {
+                type: "OBJECT",
+                properties: {
+                    ideas: {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                title: { type: "STRING" },
+                                description: { type: "STRING" }
+                            }
+                        }
+                    }
+                }
+            };
+
+            const result = await callGeminiApi(prompt, schema);
+
+            if (result && result.ideas?.length > 0) {
+                container.innerHTML = `<ul class="space-y-2">${result.ideas.map(idea => `<li><strong>${idea.title}:</strong> ${idea.description}</li>`).join('')}</ul>`;
+            } else {
+                container.innerHTML = `<p class="text-gray-500">Could not generate project ideas.</p>`;
+            }
+        }
+
+        async function renderPersonalizedHomepage() {
+            const section = document.getElementById('personalized-section');
+            if (!section || !currentUser) return;
+
+            const viewedNames = recentlyViewed.map(id => products.find(p => p.id === id)?.name).filter(Boolean).join(', ');
+            const wishlistNames = wishlist.map(id => products.find(p => p.id === id)?.name).filter(Boolean).join(', ');
+
+            if (viewedNames.length === 0 && wishlistNames.length === 0) {
+                section.remove(); // No data to personalize, remove section
+                return;
+            }
+
+            const availableProducts = products.map(p => `ID: ${p.id}, Name: ${p.name}, Category: ${p.category}`).join('\n');
+            const prompt = `A user has recently viewed: [${viewedNames}] and has these items on their wishlist: [${wishlistNames}]. Based on these interests and the full list of available products, recommend up to 4 relevant product IDs and generate a catchy title for the recommendation section like "For You" or "Based on your interest in...".\n\nAvailable Products:\n${availableProducts}`;
+            const schema = {
+                type: "OBJECT",
+                properties: {
+                    title: { type: "STRING" },
+                    product_ids: { type: "ARRAY", items: { type: "NUMBER" } }
+                }
+            };
+
+            const result = await callGeminiApi(prompt, schema);
+
+            if (result && result.product_ids?.length > 0) {
+                const recommendedProducts = products.filter(p => result.product_ids.includes(p.id));
+                section.innerHTML = `
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">✨ ${result.title || "Recommended For You"}</h2>
+                    <div class="scroll-container pb-4">
+                        ${recommendedProducts.map(p => `<div class="scroll-item">${renderProductCard(p, true)}</div>`).join('')}
+                    </div>
+                `;
+            } else {
+                 section.remove(); // Could not generate recommendations
+            }
+        }
+
+        // --- Global Event Listener ---
+        document.body.addEventListener('click', e => {
+            const target = e.target;
+            const parentBtn = target.closest('button');
+
+            // Click outside modal to close
+            if (target.matches('.modal')) {
+                closeModal(target);
+            }
+            if (target.matches('.search-suggestion')) {
+                selectSearchSuggestion(target.dataset.term);
+            }
+
+            if (parentBtn?.matches('.close-modal-btn')) closeModal(target.closest('.modal'));
+            if (target.id === 'closeConfirmation') closeAllModals();
+            if (parentBtn?.matches('.view-product-btn') || target.closest('img[data-product-id]')) {
+                renderProductModal(parseInt(parentBtn?.dataset.productId || target.closest('img[data-product-id]').dataset.productId));
+            }
+            if (parentBtn?.matches('.add-to-cart-btn')) {
+                addToCart(parseInt(parentBtn.dataset.productId), parentBtn.dataset.fromRec === 'true');
+            }
+            if (parentBtn?.matches('.buy-now-btn')) {
+                 handleBuyNow(parseInt(parentBtn.dataset.productId));
+            }
+            if (parentBtn?.matches('.wishlist-btn')) toggleWishlist(parseInt(parentBtn.dataset.productId), parentBtn);
+            if (target.closest('.rating-stars') && target.matches('.fa-star')) {
+                const productId = parseInt(target.parentElement.dataset.productId);
+                const rating = parseInt(target.dataset.value);
+                target.parentElement.querySelectorAll('.fa-star').forEach(star => {
+                    star.classList.toggle('selected', parseInt(star.dataset.value) <= rating);
+                });
+                handleRating(productId, rating);
+            }
+            if (parentBtn?.matches('.quantity-change')) {
+                changeQuantity(parseInt(parentBtn.dataset.productId), parseInt(parentBtn.dataset.change));
+            }
+            if (parentBtn?.matches('.remove-from-cart')) {
+                removeFromCart(parseInt(parentBtn.dataset.productId));
+            }
+             if (target.id === 'proceedToCheckoutBtn') { 
+                if (!currentUser) { 
+                    renderAuthModal('login');
+                    return;
+                }
+                closeModal(cartModalEl); 
+                renderCheckoutModal('address'); 
+            }
+            if (target.matches('.accordion-btn')) {
+                const content = target.nextElementSibling;
+                const icon = target.querySelector('i');
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                    icon.classList.remove('rotate-180');
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    icon.classList.add('rotate-180');
+                }
+            }
+            if(target.id === 'cart-recommendations-btn') handleCartRecommendations(target);
+            if(target.id === 'review-summary-btn') handleReviewSummary(target);
+            if(target.id === 'project-ideas-btn') handleProjectIdeas(target);
+            if(target.id === 'price-compare-btn') handlePriceComparison(target);
+
+            if (target.id === 'show-signup') { e.preventDefault(); renderAuthModal('signup'); }
+            if (target.id === 'show-login') { e.preventDefault(); renderAuthModal('login'); }
+             if (target.id === 'back-to-address-btn') {
+                renderCheckoutModal('address');
+            }
+             if (target.id === 'login-from-review') {
+                closeAllModals();
+                renderAuthModal('login');
+            }
+            if (parentBtn?.matches('.home-nav-btn') || parentBtn?.matches('.back-to-all-btn-empty')) {
+                closeAllModals();
+                navigate('home');
+            }
+            if (target.id === 'clear-filters-btn') {
+                sessionStorage.removeItem('activeFilters');
+                updateDisplayedProducts();
+                closeModal(filterModalEl);
+            }
+        });
+        
+        document.body.addEventListener('submit', async e => {
+            e.preventDefault();
+            if (e.target.matches('.review-form')) {
+                const productId = parseInt(e.target.dataset.productId);
+                const reviewText = e.target.querySelector('textarea').value;
+                handleReviewSubmit(productId, reviewText);
+            }
+            if (e.target.id === 'addressForm') {
+                const formData = new FormData(e.target);
+                const deliveryOption = formData.get('deliveryOption');
+                let address;
+                if (deliveryOption === 'home') {
+                     address = {
+                        name: formData.get('name'),
+                        fullAddress: `${formData.get('address')}, ${formData.get('city')} - ${formData.get('pincode')}`
+                    };
+                } else {
+                     address = {
+                        name: currentUser.name,
+                        fullAddress: `Campus Pickup: ${formData.get('pickupPoint')}`
+                    };
+                }
+                sessionStorage.setItem('shippingAddress', JSON.stringify(address));
+                renderCheckoutModal('payment');
+            }
+             if (e.target.id === 'paymentForm') {
+                renderCheckoutModal('processing');
+                setTimeout(() => {
+                    const address = JSON.parse(sessionStorage.getItem('shippingAddress'));
+                    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+                    const orderDetails = {
+                        items: [...cart],
+                        total: total,
+                        address: address
+                    };
+                    if(currentUser) {
+                         currentUser.orders.push(orderDetails);
+                         currentUser.points += Math.floor(total / 10);
+                    }
+                    cart = [];
+                    updateCart();
+                    renderCheckoutModal('confirmation', orderDetails);
+                }, 2000);
+            }
+            if (e.target.id === 'loginForm' || e.target.id === 'signupForm') {
+                const nameInput = e.target.querySelector('input[type="text"]');
+                const emailInput = e.target.querySelector('input[type="email"]');
+                const name = nameInput ? nameInput.value : 'JCOET Student';
+                const email = emailInput.value;
+                loginUser(name, email);
+            }
+            if (e.target.id === 'contact-form') {
+                const form = e.target;
+                const button = form.querySelector('button[type="submit"]');
+                const feedbackEl = document.getElementById('contact-form-feedback');
+
+                button.disabled = true;
+                button.innerHTML = 'Sending...';
+
+                // Simulate sending a message
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = 'Send Message';
+                    feedbackEl.innerHTML = `<p class="text-green-500">Message sent successfully!</p>`;
+                    form.reset();
+                    setTimeout(() => { feedbackEl.innerHTML = '' }, 3000);
+                }, 1500);
+            }
+             if (e.target.id === 'project-submit-form') {
+                const formData = new FormData(e.target);
+                const newProject = {
+                    id: studentProjects.length + 1,
+                    student: formData.get('Your Name'), // This should match the input name
+                    title: formData.get('Project Title'),
+                    image: formData.get('Project Image URL'),
+                    description: formData.get('Description')
+                };
+                // In a real app, you'd send this to a server. Here we just add it to our local array.
+                studentProjects.unshift(newProject);
+                closeModal(projectSubmitModalEl);
+                navigate('showcase'); // Refresh showcase page
+            }
+            if (e.target.id === 'filter-form') {
+                const formData = new FormData(e.target);
+                const selectedCategory = formData.get('category');
+                const maxPrice = document.getElementById('price-range').value;
+                const filters = {
+                    categories: selectedCategory ? [selectedCategory] : [],
+                    maxPrice: maxPrice
+                };
+                sessionStorage.setItem('activeFilters', JSON.stringify(filters));
+                updateDisplayedProducts(null, null, filters);
+                closeModal(filterModalEl);
+            }
+            if (e.target.id === 'ai-assistant-form') {
+                const promptText = document.getElementById('ai-prompt').value;
+                const loader = document.getElementById('ai-assistant-loader');
+                const resultsContainer = document.getElementById('ai-assistant-results');
+                
+                if(!promptText) return;
+
+                loader.classList.remove('hidden');
+                resultsContainer.innerHTML = '';
+                
+                const availableProducts = products.map(p => `ID: ${p.id}, Name: ${p.name}, Category: ${p.category}`).join('\n');
+                const fullPrompt = `Based on the user request "${promptText}" and the following available products:\n${availableProducts}\n\nRecommend up to 4 relevant product IDs.`;
+                const schema = {
+                  type: "OBJECT",
+                  properties: {
+                    summary: { type: "STRING" },
+                    product_ids: {
+                      type: "ARRAY",
+                      items: { type: "NUMBER" }
+                    }
+                  }
+                };
+                const result = await callGeminiApi(fullPrompt, schema, true);
+
+                loader.classList.add('hidden');
+                if (result && result.product_ids) {
+                    const recommendedProducts = products.filter(p => result.product_ids.includes(p.id));
+                    resultsContainer.innerHTML = `<p class="font-semibold mb-2">${result.summary || 'Here are some recommendations:'}</p>` +
+                    `<div class="grid grid-cols-2 gap-4">${recommendedProducts.map(p => renderProductCard(p, true)).join('')}</div>`;
+                } else {
+                    resultsContainer.innerHTML = `<p class="text-center text-gray-500">Sorry, I couldn't find any matching products.</p>`;
+                }
+            }
+        });
+
+        async function handleCartRecommendations(btn) {
+            const loader = document.getElementById('cart-recommendations-loader');
+            const contentContainer = document.getElementById('cart-recommendations-content');
+            
+            btn.classList.add('hidden');
+            loader.classList.remove('hidden');
+            contentContainer.innerHTML = '';
+
+            const cartNames = cart.map(item => item.name).join(', ');
+            const availableProducts = products.filter(p => !cart.find(item => item.id === p.id)).map(p => `ID: ${p.id}, Name: ${p.name}`).join('\n');
+            const prompt = `A user has these items in their cart: ${cartNames}. Based on the following available products, suggest up to 2 complementary items.\n${availableProducts}`;
+            const schema = {
+                type: "OBJECT",
+                properties: {
+                    product_ids: {
+                        type: "ARRAY",
+                        items: { type: "NUMBER" }
+                    }
+                }
+            };
+            const result = await callGeminiApi(prompt, schema);
+            
+            loader.classList.add('hidden');
+            if (result && result.product_ids && result.product_ids.length > 0) {
+                const recommended = products.filter(p => result.product_ids.includes(p.id));
+                 contentContainer.innerHTML = `<p class="text-sm font-semibold mb-2">You might also like:</p><div class="flex gap-2">${recommended.map(p => `
+                    <div class="text-center w-1/2">
+                        <img src="${p.image}" class="rounded-md h-20 w-full object-cover cursor-pointer view-product-btn" data-product-id="${p.id}">
+                        <p class="text-xs truncate mt-1">${p.name}</p>
+                        <button class="add-to-cart-btn text-xs bg-amber-100 text-amber-800 rounded-full px-2 py-1 mt-1" data-product-id="${p.id}" data-from-rec="true">Add</button>
+                    </div>
+                `).join('')}</div>`;
+            } else {
+                btn.classList.remove('hidden');
+            }
+        }
+        
+        // --- Initial Load ---
+        recentlyViewed = JSON.parse(sessionStorage.getItem('recentlyViewed')) || [];
+        updateAuthSection(); // Initial render of auth section
+        navigate('home');
+
+        // Attach search listeners globally as search bars are now static
+        document.getElementById('desktopSearchInput').addEventListener('input', handleSearch);
+        document.getElementById('mobileSearchInput').addEventListener('input', handleSearch);
+    });
+    </script>
+</body>
+</html>
+
